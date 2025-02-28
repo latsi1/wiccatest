@@ -59,13 +59,13 @@ export default function PoopGame() {
     };
 
     const poopEmoji = "💩";
-    let poops: Poop[] = [];
-    let platforms: Platform[] = [];
+    const poops: Poop[] = [];
+    const platforms: Platform[] = [];
     let score = 0;
     const gravity = 0.25;
     const jumpForce = -12;
     const maxFallSpeed = 8;
-    let keys: { [key: string]: boolean } = {};
+    const keys: { [key: string]: boolean } = {};
     const finishLine = {
       worldX: WORLD_WIDTH - 100,
       x: 0,
@@ -230,7 +230,7 @@ export default function PoopGame() {
       }
 
       // Platform collisions
-      const onPlatform = checkPlatformCollisions();
+      checkPlatformCollisions();
 
       // Update camera position
       cameraX = player.worldX - VIEWPORT_WIDTH / 3;
@@ -240,7 +240,7 @@ export default function PoopGame() {
       player.x = player.worldX - cameraX;
 
       // Check poop collection
-      poops.forEach((poop, index) => {
+      poops.forEach((poop) => {
         poop.x = poop.worldX - cameraX;
         if (!poop.collected && collides(player, poop)) {
           poop.collected = true;

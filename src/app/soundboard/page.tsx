@@ -53,7 +53,7 @@ export default function Soundboard() {
       setVisitorCount(newCount);
       localStorage.setItem("visitorCount", newCount.toString());
     }
-  }, []);
+  }, [visitorCount]);
 
   useEffect(() => {
     const fetchSounds = async () => {
