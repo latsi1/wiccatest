@@ -12,6 +12,10 @@ interface Sound {
   icon: string;
 }
 
+interface WebAudioAPI extends Window {
+  webkitAudioContext: typeof AudioContext;
+}
+
 const SOUNDS_PER_PAGE = 42;
 
 export default function Soundboard() {
@@ -39,6 +43,17 @@ export default function Soundboard() {
   const audioContextRef = useRef<AudioContext | null>(null);
   const gainNodeRef = useRef<GainNode | null>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
+
+  useEffect(() => {
+    const storedCount = localStorage.getItem("visitorCount");
+    if (storedCount) {
+      setVisitorCount(parseInt(storedCount, 10));
+    } else {
+      const newCount = visitorCount + 1;
+      setVisitorCount(newCount);
+      localStorage.setItem("visitorCount", newCount.toString());
+    }
+  }, []);
 
   useEffect(() => {
     const fetchSounds = async () => {
@@ -72,8 +87,10 @@ export default function Soundboard() {
 
   const initAudioContext = () => {
     if (!audioContextRef.current) {
-      audioContextRef.current = new (window.AudioContext ||
-        (window as any).webkitAudioContext)();
+      const AudioCtx =
+        window.AudioContext ||
+        (window as unknown as WebAudioAPI).webkitAudioContext;
+      audioContextRef.current = new AudioCtx();
       gainNodeRef.current = audioContextRef.current.createGain();
       gainNodeRef.current.gain.value = volume / 100;
       gainNodeRef.current.connect(audioContextRef.current.destination);
