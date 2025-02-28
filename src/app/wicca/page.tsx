@@ -1,10 +1,10 @@
-'use client';
+"use client";
 
-import { useState } from 'react';
+import { useState } from "react";
 
 export default function WiccaConverter() {
-  const [pounds, setPounds] = useState('');
-  const [kilograms, setKilograms] = useState('');
+  const [pounds, setPounds] = useState("");
+  const [kilograms, setKilograms] = useState("");
 
   const handleConversion = (e: React.FormEvent) => {
     e.preventDefault();
@@ -21,10 +21,13 @@ export default function WiccaConverter() {
         <h1 className="text-3xl font-bold text-purple-800 mb-6 text-center">
           Pounds to Kilograms Converter
         </h1>
-        
+
         <form onSubmit={handleConversion} className="space-y-4">
           <div>
-            <label htmlFor="pounds" className="block text-sm font-medium text-gray-700 mb-1">
+            <label
+              htmlFor="pounds"
+              className="block text-sm font-medium text-gray-700 mb-1"
+            >
               Pounds (lbs)
             </label>
             <input
@@ -37,18 +40,21 @@ export default function WiccaConverter() {
               step="any"
             />
           </div>
-          
+
           <button
             type="submit"
             className="w-full bg-purple-600 text-white py-2 px-4 rounded-md hover:bg-purple-700 transition-colors"
           >
             Convert
           </button>
-          
+
           {kilograms && (
             <div className="mt-4 p-4 bg-purple-50 rounded-md">
               <p className="text-center text-lg">
-                <span className="font-semibold">{pounds} lbs</span> = <span className="font-bold text-purple-800">{kilograms} kg</span>
+                <span className="font-semibold">{pounds} lbs</span> ={" "}
+                <span className="font-bold text-purple-800">
+                  {kilograms} kg
+                </span>
               </p>
             </div>
           )}
@@ -56,4 +62,4 @@ export default function WiccaConverter() {
       </div>
     </div>
   );
-} 
+}
