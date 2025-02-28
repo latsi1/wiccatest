@@ -165,6 +165,11 @@ export default function Soundboard() {
     }
   };
 
+  const handleCategoryChange = (newCategory: string) => {
+    setCategory(newCategory);
+    setCurrentPage(1);
+  };
+
   const filteredSounds = soundsData.filter((sound) => {
     const matchesCategory = category === "all" || sound.category === category;
     const matchesSearch =
@@ -173,7 +178,17 @@ export default function Soundboard() {
     return matchesCategory && matchesSearch;
   });
 
-  const totalPages = Math.ceil(filteredSounds.length / SOUNDS_PER_PAGE);
+  const totalPages = Math.max(
+    1,
+    Math.ceil(filteredSounds.length / SOUNDS_PER_PAGE)
+  );
+
+  useEffect(() => {
+    if (currentPage > totalPages) {
+      setCurrentPage(totalPages);
+    }
+  }, [currentPage, totalPages]);
+
   const currentSounds = filteredSounds.slice(
     (currentPage - 1) * SOUNDS_PER_PAGE,
     currentPage * SOUNDS_PER_PAGE
@@ -237,7 +252,7 @@ export default function Soundboard() {
         <select
           className={styles.categorySelector}
           value={category}
-          onChange={(e) => setCategory(e.target.value)}
+          onChange={(e) => handleCategoryChange(e.target.value)}
         >
           <option value="all">All Sounds ({soundsData.length})</option>
           <option value="wav">
@@ -258,7 +273,10 @@ export default function Soundboard() {
             type="text"
             placeholder="Search sounds..."
             value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
+            onChange={(e) => {
+              setSearchTerm(e.target.value);
+              setCurrentPage(1);
+            }}
             className={styles.searchInput}
           />
         </div>
@@ -279,23 +297,29 @@ export default function Soundboard() {
           ))}
         </div>
 
-        <div className={styles.pagination}>
-          <button
-            onClick={() => setCurrentPage((p) => p - 1)}
-            disabled={currentPage === 1}
-          >
-            <i className="fas fa-chevron-left"></i> Previous
-          </button>
-          <span className={styles.paginationInfo}>
-            Page {currentPage} of {totalPages}
-          </span>
-          <button
-            onClick={() => setCurrentPage((p) => p + 1)}
-            disabled={currentPage === totalPages}
-          >
-            Next <i className="fas fa-chevron-right"></i>
-          </button>
-        </div>
+        {filteredSounds.length > 0 ? (
+          <div className={styles.pagination}>
+            <button
+              onClick={() => setCurrentPage((p) => p - 1)}
+              disabled={currentPage === 1}
+            >
+              <i className="fas fa-chevron-left"></i> Previous
+            </button>
+            <span className={styles.paginationInfo}>
+              Page {currentPage} of {totalPages}
+            </span>
+            <button
+              onClick={() => setCurrentPage((p) => p + 1)}
+              disabled={currentPage === totalPages}
+            >
+              Next <i className="fas fa-chevron-right"></i>
+            </button>
+          </div>
+        ) : (
+          <div className={styles.noResults}>
+            <p>No sounds found matching your criteria</p>
+          </div>
+        )}
       </main>
 
       <footer className={styles.footer}>
