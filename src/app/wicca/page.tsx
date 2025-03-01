@@ -36,7 +36,25 @@ export default function WiccaPage() {
         throw new Error(data.error);
       }
 
-      setPoem(data.poem);
+      // Clean up the poem text to remove conversation markers
+      let cleanedPoem = data.poem;
+      if (cleanedPoem) {
+        // Remove common model formatting markers and anything after them
+        cleanedPoem = cleanedPoem.replace(/User:[\s\S]*$/i, "");
+        cleanedPoem = cleanedPoem.replace(/Assistant:[\s\S]*$/i, "");
+        cleanedPoem = cleanedPoem.replace(/<\|im_start\|>user[\s\S]*$/i, "");
+        cleanedPoem = cleanedPoem.replace(/<\|im_end\|>[\s\S]*$/i, "");
+        cleanedPoem = cleanedPoem.replace(/\buser[\s\S]*$/i, "");
+        cleanedPoem = cleanedPoem.replace(/\bassistant[\s\S]*$/i, "");
+        cleanedPoem = cleanedPoem.replace(/\bhuman[\s\S]*$/i, "");
+        cleanedPoem = cleanedPoem.replace(/\bai[\s\S]*$/i, "");
+
+        // Remove any trailing whitespace, dashes, or other common separators
+        cleanedPoem = cleanedPoem.replace(/[\s\-_]+$/g, "");
+        cleanedPoem = cleanedPoem.trim();
+      }
+
+      setPoem(cleanedPoem);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to generate poem");
     } finally {
@@ -75,7 +93,25 @@ export default function WiccaPage() {
       console.log("Raw response data:", data);
       console.log("Poem content:", data.spell);
 
-      setPoem(data.spell);
+      // Clean up the poem text to remove conversation markers
+      let cleanedPoem = data.spell;
+      if (cleanedPoem) {
+        // Remove common model formatting markers and anything after them
+        cleanedPoem = cleanedPoem.replace(/User:[\s\S]*$/i, "");
+        cleanedPoem = cleanedPoem.replace(/Assistant:[\s\S]*$/i, "");
+        cleanedPoem = cleanedPoem.replace(/<\|im_start\|>user[\s\S]*$/i, "");
+        cleanedPoem = cleanedPoem.replace(/<\|im_end\|>[\s\S]*$/i, "");
+        cleanedPoem = cleanedPoem.replace(/\buser[\s\S]*$/i, "");
+        cleanedPoem = cleanedPoem.replace(/\bassistant[\s\S]*$/i, "");
+        cleanedPoem = cleanedPoem.replace(/\bhuman[\s\S]*$/i, "");
+        cleanedPoem = cleanedPoem.replace(/\bai[\s\S]*$/i, "");
+
+        // Remove any trailing whitespace, dashes, or other common separators
+        cleanedPoem = cleanedPoem.replace(/[\s\-_]+$/g, "");
+        cleanedPoem = cleanedPoem.trim();
+      }
+
+      setPoem(cleanedPoem);
     } catch (error) {
       console.error("Error generating spell:", error);
       setError(
