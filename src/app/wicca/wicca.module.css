@@ -1,0 +1,194 @@
+.container {
+  min-height: 100vh;
+  background-image: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)),
+    url("/images/wicca-bg.jpg");
+  background-size: cover;
+  background-position: center;
+  background-attachment: fixed;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 2rem;
+  color: #f0f0f0;
+}
+
+.header {
+  text-align: center;
+  margin-bottom: 2rem;
+  width: 100%;
+  max-width: 800px;
+}
+
+.title {
+  font-size: 3rem;
+  margin-bottom: 1rem;
+  font-family: "Cinzel", serif;
+  color: #e0e0e0;
+  text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+  letter-spacing: 2px;
+}
+
+.subtitle {
+  font-size: 1.2rem;
+  color: #d0d0d0;
+  font-style: italic;
+  margin-bottom: 1.5rem;
+}
+
+.formContainer {
+  background-color: rgba(30, 30, 30, 0.8);
+  padding: 2rem;
+  border-radius: 12px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+  width: 100%;
+  max-width: 800px;
+  margin-bottom: 2rem;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.inputGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.label {
+  font-size: 1.1rem;
+  color: #e0e0e0;
+  font-weight: 500;
+}
+
+.input,
+.textarea {
+  padding: 0.8rem 1rem;
+  border-radius: 8px;
+  background-color: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: #ffffff;
+  font-size: 1rem;
+  transition: all 0.3s ease;
+}
+
+.input:focus,
+.textarea:focus {
+  outline: none;
+  border-color: rgba(255, 255, 255, 0.4);
+  background-color: rgba(255, 255, 255, 0.15);
+  box-shadow: 0 0 8px rgba(255, 255, 255, 0.1);
+}
+
+.textarea {
+  min-height: 120px;
+  resize: vertical;
+}
+
+.button {
+  background: linear-gradient(135deg, #9c27b0, #673ab7);
+  color: white;
+  border: none;
+  padding: 1rem;
+  border-radius: 8px;
+  font-size: 1.1rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-weight: 600;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.4);
+  background: linear-gradient(135deg, #b52cc5, #7e57c2);
+}
+
+.button:active {
+  transform: translateY(0);
+}
+
+.button:disabled {
+  background: #666;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+.poemContainer {
+  background-color: rgba(20, 20, 20, 0.85);
+  padding: 3rem;
+  border-radius: 12px;
+  margin-top: 2rem;
+  max-width: 800px;
+  width: 100%;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  min-height: 300px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(4px);
+}
+
+.spinnerContainer {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  height: 100%;
+  min-height: 200px;
+}
+
+.error {
+  color: #ff6b6b;
+  text-align: center;
+  width: 100%;
+  align-self: center;
+  padding: 1rem;
+  background-color: rgba(255, 0, 0, 0.1);
+  border-radius: 8px;
+  font-weight: 500;
+}
+
+.poem {
+  white-space: pre-line;
+  font-family: "Georgia", serif;
+  font-size: 1.3rem;
+  line-height: 1.8;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  color: #f5f5f5;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+@media (max-width: 768px) {
+  .container {
+    padding: 1rem;
+  }
+
+  .title {
+    font-size: 2.2rem;
+  }
+
+  .formContainer,
+  .poemContainer {
+    padding: 1.5rem;
+  }
+
+  .poem {
+    font-size: 1.1rem;
+    line-height: 1.6;
+  }
+}

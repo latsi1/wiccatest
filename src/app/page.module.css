@@ -1,0 +1,41 @@
+.main {
+  min-height: 100vh;
+  background-color: #000;
+  color: #00ff00;
+  font-family: "Courier New", monospace;
+  padding: 2rem;
+  position: relative;
+}
+
+.languageSwitch {
+  position: fixed;
+  top: 1rem;
+  right: 1rem;
+  z-index: 10;
+  display: flex;
+  gap: 0.5rem;
+}
+
+.langButton {
+  background: transparent;
+  border: 1px solid #00ff00;
+  color: #00ff00;
+  padding: 0.5rem 1rem;
+  cursor: pointer;
+  font-family: "Courier New", monospace;
+  transition: all 0.3s ease;
+}
+
+.langButton:hover {
+  background: rgba(0, 255, 0, 0.1);
+}
+
+.langButton.active {
+  background: rgba(0, 255, 0, 0.2);
+}
+
+.content {
+  max-width: 800px;
+  margin: 0 auto;
+  padding-top: 2rem;
+}

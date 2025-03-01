@@ -1,65 +1,135 @@
 "use client";
 
-import { useState } from "react";
+import React, { useState } from "react";
+import { LoadingSpinner } from "../components/LoadingSpinner";
+import LoadingText from "../components/LoadingText";
+import styles from "./wicca.module.css";
 
-export default function WiccaConverter() {
-  const [pounds, setPounds] = useState("");
-  const [kilograms, setKilograms] = useState("");
+export default function WiccaPage() {
+  const [desire, setDesire] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [poem, setPoem] = useState<string | null>(null);
 
-  const handleConversion = (e: React.FormEvent) => {
+  const generatePoem = async () => {
+    if (!desire.trim()) {
+      setError("Please enter a desire");
+      return;
+    }
+
+    setIsLoading(true);
+    setError("");
+    setPoem("");
+
+    try {
+      const response = await fetch("/api/wicca-poem", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ desire }),
+      });
+
+      const data = await response.json();
+
+      if (data.error) {
+        throw new Error(data.error);
+      }
+
+      setPoem(data.poem);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to generate poem");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const lbs = parseFloat(pounds);
-    if (!isNaN(lbs)) {
-      const kg = lbs * 0.45359237;
-      setKilograms(kg.toFixed(2));
+
+    if (!desire.trim()) {
+      setError("Please enter your desire");
+      return;
+    }
+
+    setError(null);
+    setIsLoading(true);
+
+    try {
+      const response = await fetch("/api/wicca-poem", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          desire: desire,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error(`Error: ${response.statusText}`);
+      }
+
+      const data = await response.json();
+
+      console.log("Raw response data:", data);
+      console.log("Poem content:", data.spell);
+
+      setPoem(data.spell);
+    } catch (error) {
+      console.error("Error generating spell:", error);
+      setError(
+        error instanceof Error ? error.message : "Failed to generate spell"
+      );
+    } finally {
+      setIsLoading(false);
     }
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-purple-100 to-purple-200 p-8">
-      <div className="max-w-md mx-auto bg-white rounded-xl shadow-md overflow-hidden p-6">
-        <h1 className="text-3xl font-bold text-purple-800 mb-6 text-center">
-          Pounds to Kilograms Converter
-        </h1>
+    <div className={styles.container}>
+      <header className={styles.header}>
+        <h1 className={styles.title}>Wicca Loitsugeneraattori</h1>
+        <p className={styles.subtitle}>
+          Kirjoita toiveesi ja vastaanota mystinen loitsu
+        </p>
+      </header>
 
-        <form onSubmit={handleConversion} className="space-y-4">
-          <div>
-            <label
-              htmlFor="pounds"
-              className="block text-sm font-medium text-gray-700 mb-1"
-            >
-              Pounds (lbs)
+      <div className={styles.formContainer}>
+        <form className={styles.form} onSubmit={handleSubmit}>
+          <div className={styles.inputGroup}>
+            <label htmlFor="desire" className={styles.label}>
+              Toiveesi
             </label>
-            <input
-              type="number"
-              id="pounds"
-              value={pounds}
-              onChange={(e) => setPounds(e.target.value)}
-              placeholder="Enter weight in pounds"
-              className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-              step="any"
+            <textarea
+              id="desire"
+              value={desire}
+              onChange={(e) => setDesire(e.target.value)}
+              className={styles.textarea}
+              placeholder="Kirjoita toiveesi tähän..."
+              required
             />
           </div>
 
-          <button
-            type="submit"
-            className="w-full bg-purple-600 text-white py-2 px-4 rounded-md hover:bg-purple-700 transition-colors"
-          >
-            Convert
+          <button type="submit" className={styles.button} disabled={isLoading}>
+            {isLoading ? "Luodaan loitsua..." : "Luo loitsu"}
           </button>
-
-          {kilograms && (
-            <div className="mt-4 p-4 bg-purple-50 rounded-md">
-              <p className="text-center text-lg">
-                <span className="font-semibold">{pounds} lbs</span> ={" "}
-                <span className="font-bold text-purple-800">
-                  {kilograms} kg
-                </span>
-              </p>
-            </div>
-          )}
         </form>
       </div>
+
+      {(isLoading || error || poem) && (
+        <div className={styles.poemContainer}>
+          {isLoading ? (
+            <div className={styles.spinnerContainer}>
+              <LoadingText />
+            </div>
+          ) : error ? (
+            <p className={styles.error}>{error}</p>
+          ) : (
+            <div className={styles.poem}>{poem}</div>
+          )}
+        </div>
+      )}
     </div>
   );
 }

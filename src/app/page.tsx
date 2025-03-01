@@ -1,101 +1,104 @@
-import Image from "next/image";
+"use client";
+
+import React, { useState } from "react";
+import styles from "./page.module.css";
+import { TypewriterText } from "@/app/components/TypewriterText";
+
+const content = {
+  finnish: [
+    "Mitä teen itse päivittäin",
+    "",
+    "Visualisointi on asia mitä teen itse päivittäin. Jokaisella meistä on oma tapansa tehdä tämä ja tässä on yksi tapa miten itse teen.",
+    "",
+    "Lähestulkoon joka päivä ennen nukkumaan menoa otan mukavan asennon ja poistan häiriötekiät läheltäni esim puhelimen yms. Puhdistan mieleni kaikesta turhasta ja keskityn 1 asiaan siihen omaan lämpöiseen paikkaan minne haluan mennä mielessäni.",
+    "",
+    "Paikka voi olla ihan minkälainen sinä itse haluat. Todellinen tai fantasiaa sillä ei ole väliä kunhan vaan se tuntuu oikealta juuri sinulle. Yleensä tälläinen paikak ilmestyy sinulle itsestään kunhan saavutat oikean mielentilan. Harjoitusta tämä vaatii sillä oman mielen tyhjentäminen ei ole aina helppoa.",
+    "",
+    "Itse kutsun tälläistä paikkaa voimapaikaksi. Omassa voimapaikassani voin tehdä niitä asioita mitä itse haluan. Yleisin mitä teen on kysyn apua askarruttaviin asioihin ja niihin tulee vastaus joskus suoraan ja joskus hyvin monimutkaisesti mikä pitää tulkita jälkeenpäin.",
+    "",
+    "tämä on myös paikka missä voin rentoutua ja tavata minulle rakkaita olevia ihmisiä, eläimiä tai henkiä. Paikka jossa voi lähestulkoon tehdä mitä itse haluaa.",
+    "",
+    "Tästä asiasta voisi kirjoittaa vaikak kuinka paljon mutta kukapa haluaisi lukea kilometrin pituista blogia. Kirjoitan varmasti asiasta viellä lisää koska tämä oli pintaraapaisu asiasta.",
+    "",
+    "---------------------------------------------------------------------------------------------------",
+    "",
+    "Millainen ihminen on wicca ja mitä hän tekee...",
+    "",
+    "Suurinosa ihmisistä ihmisistä luulee että kyseessä on nuorten suosioon tullut humpuuki uskomus, mikä pitää sisällään jopa saatananpalvonnan alkeet.",
+    "",
+    "Itse olen wicca ollut jo pitkään ja voin sanoa että se on kaikkea muuta kuin edellämainitsemat asiat. ihmisten korviin vain särähtää sana wicca tai noita ehkäpä se johtunee siitä ja tietenkin tiedon vähyydestä.",
+    "",
+    "Listaan lyhyesti mitä tulen käsittelemään tässä blogissa jatkossa",
+    "",
+    "- Energian käyttö",
+    "- Visualisointi",
+    "- luonto ja sen kuunteleminen",
+    "",
+    "Tuossa on nyt 3 asiaa mitkä kattavat aika ison paketin. Kunhan olen käsitellyt yllämainitut 3 asiaa Lisään listaan asioita mitkä ovat hiukak monimutkaisempia mutta kiinnostavia asioita :)",
+    "",
+    "Muistakaa wiccoja on tuhansia erinlaisia ja jokainen tekee asiat erilailla. Tulette huomaamaan että teen asioita ihan toisin kuin ns oppikirjoissa kerrotaan.",
+  ],
+  english: [
+    "What I do myself every day",
+    "",
+    "Visualization is something I do myself every day. Each of us has our own way of doing this and here is one way I do it myself.",
+    "",
+    "Almost every day before going to sleep, I take a comfortable position and remove distractions near me, e.g. the phone, etc. I clear my mind of everything unnecessary and focus on 1 thing in the warm place where I want to go in my mind.",
+    "",
+    "The place can be whatever you want it to be. It doesn't matter whether it's real or fantasy, as long as it feels right for you. Usually, this place will appear to you by itself, as long as you reach the right state of mind. This requires practice because emptying your mind is not always easy.",
+    "",
+    "I personally call this place a place of power. In my own place of strength, I can do the things I want. The most common thing I do is ask for help with confusing things, and the answer is sometimes direct and sometimes very complicated, which has to be interpreted afterwards.",
+    "",
+    "this is also a place where I can relax and meet people, animals or spirits that are dear to me. A place where you can almost do what you want.",
+    "",
+    "You could write a lot about this matter, but who would want to read a kilometer-long blog. I will definitely write more about it because this was just scratching the surface.",
+    "",
+    "-------------------------------------------------- --------------------------------------------------",
+    "",
+    "What kind of person is a wicca and what does he do...",
+    "",
+    "Most of the people think that it is a hoax belief that has become popular among young people, which even includes the rudiments of Satan worship.",
+    "",
+    "I myself have been wicca for a long time and I can say that it is anything but the things mentioned above. people just hear the word wicca or witch, maybe it's because of that and of course the lack of information.",
+    "",
+    "I will briefly list what I will cover in this blog in the future",
+    "",
+    "- Energy use",
+    "- Visualization",
+    "- nature and listening to it",
+    "",
+    "There are now 3 things that cover a pretty big package. Once I've dealt with the above-mentioned 3 things, I'll add things to the list that are a bit more complicated but interesting things :)",
+    "",
+    "Remember there are thousands of different Wiccans and everyone does things differently. You will notice that I do things quite differently from what is told in the so-called textbooks.",
+  ],
+};
 
 export default function Home() {
-  return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-8 row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-semibold">
-              src/app/page.tsx
-            </code>
-            .
-          </li>
-          <li>Save and see your changes instantly.</li>
-        </ol>
+  const [language, setLanguage] = useState<"finnish" | "english">("finnish");
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:min-w-44"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
-        </div>
-      </main>
-      <footer className="row-start-3 flex gap-6 flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
+  return (
+    <main className={styles.main}>
+      <div className={styles.languageSwitch}>
+        <button
+          className={`${styles.langButton} ${
+            language === "finnish" ? styles.active : ""
+          }`}
+          onClick={() => setLanguage("finnish")}
         >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
+          FI
+        </button>
+        <button
+          className={`${styles.langButton} ${
+            language === "english" ? styles.active : ""
+          }`}
+          onClick={() => setLanguage("english")}
         >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
-    </div>
+          EN
+        </button>
+      </div>
+      <div className={styles.content}>
+        <TypewriterText text={content[language]} />
+      </div>
+    </main>
   );
 }
