@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { Pool } from "pg";
+import { mockWiccaPosts } from "./mockData";
 
 // Create a connection pool to the Neon database
 const pool = new Pool({
@@ -23,7 +24,34 @@ async function initializeDatabase() {
       )
     `);
     console.log("Database table initialized successfully");
+
+    // Check if there are any posts in the database
+    const result = await client.query("SELECT COUNT(*) FROM posts");
+    const count = parseInt(result.rows[0].count);
+
+    // If no posts exist, insert the mock data
+    if (count === 0) {
+      console.log("No posts found in database. Adding mock data...");
+
+      // Use a transaction to ensure all inserts succeed or fail together
+      await client.query("BEGIN");
+
+      for (const post of mockWiccaPosts) {
+        await client.query(
+          "INSERT INTO posts (nickname, content, created_at) VALUES ($1, $2, $3)",
+          [post.nickname, post.content, post.created_at]
+        );
+      }
+
+      await client.query("COMMIT");
+      console.log("Mock data added successfully to database");
+    } else {
+      console.log(`Found ${count} existing posts in database`);
+    }
   } catch (error) {
+    if (client.query) {
+      await client.query("ROLLBACK");
+    }
     console.error("Error initializing database:", error);
   } finally {
     client.release();
@@ -47,10 +75,9 @@ export async function GET() {
     }
   } catch (error) {
     console.error("Error fetching posts:", error);
-    return NextResponse.json(
-      { error: "Failed to fetch posts" },
-      { status: 500 }
-    );
+    // Return mock data if database connection fails or in development mode
+    console.log("Using mock data for posts");
+    return NextResponse.json({ posts: mockWiccaPosts });
   }
 }
 

@@ -6,7 +6,8 @@
     "dev": "next dev --turbopack",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "seed": "ts-node --project tsconfig.json src/app/api/posts/seed.ts"
   },
   "dependencies": {
     "@huggingface/inference": "^3.4.1",

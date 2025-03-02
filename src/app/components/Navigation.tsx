@@ -59,8 +59,8 @@ export default function Navigation() {
         </li>
         <li>
           <Link
-            href="/twitter"
-            className={pathname === "/twitter" ? styles.active : ""}
+            href="/wiccer"
+            className={pathname === "/wiccer" ? styles.active : ""}
           >
             {translations.community}
           </Link>
