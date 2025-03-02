@@ -1,8 +1,9 @@
 "use client";
 
-import React, { useState } from "react";
+import React from "react";
 import styles from "./page.module.css";
 import { TypewriterText } from "@/app/components/TypewriterText";
+import { useLanguage } from "./context/LanguageContext";
 
 const content = {
   finnish: [
@@ -74,28 +75,10 @@ const content = {
 };
 
 export default function Home() {
-  const [language, setLanguage] = useState<"finnish" | "english">("finnish");
+  const { language } = useLanguage();
 
   return (
     <main className={styles.main}>
-      <div className={styles.languageSwitch}>
-        <button
-          className={`${styles.langButton} ${
-            language === "finnish" ? styles.active : ""
-          }`}
-          onClick={() => setLanguage("finnish")}
-        >
-          FI
-        </button>
-        <button
-          className={`${styles.langButton} ${
-            language === "english" ? styles.active : ""
-          }`}
-          onClick={() => setLanguage("english")}
-        >
-          EN
-        </button>
-      </div>
       <div className={styles.content}>
         <TypewriterText text={content[language]} />
       </div>

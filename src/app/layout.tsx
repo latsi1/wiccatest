@@ -1,6 +1,8 @@
 import "./globals.css";
 import type { Metadata } from "next";
 import { Inter, Cinzel } from "next/font/google";
+import Navigation from "./components/Navigation";
+import { LanguageProvider } from "./context/LanguageContext";
 
 const inter = Inter({ subsets: ["latin"] });
 const cinzel = Cinzel({
@@ -28,7 +30,10 @@ export default function RootLayout({
         />
       </head>
       <body style={{ background: "black", minHeight: "100vh" }}>
-        {children}
+        <LanguageProvider>
+          <Navigation />
+          {children}
+        </LanguageProvider>
       </body>
     </html>
   );

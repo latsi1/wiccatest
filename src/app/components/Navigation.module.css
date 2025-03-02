@@ -1,0 +1,107 @@
+.navigation {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 2rem;
+  background-color: rgba(0, 0, 0, 0.8);
+  color: white;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.leftSection {
+  display: flex;
+  align-items: center;
+}
+
+.languageSwitch {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.langButton {
+  background: rgba(30, 30, 30, 0.8);
+  color: #ccc;
+  border: 1px solid #444;
+  border-radius: 4px;
+  padding: 0.3rem 0.6rem;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.langButton:hover {
+  background-color: rgba(147, 112, 219, 0.2);
+  color: white;
+}
+
+.langButton.active {
+  background-color: rgba(147, 112, 219, 0.3);
+  color: white;
+  border-color: #9370db;
+}
+
+.logo {
+  font-family: var(--font-cinzel), serif;
+  font-size: 1.5rem;
+  font-weight: bold;
+}
+
+.logo a {
+  color: #9370db;
+  text-decoration: none;
+  transition: color 0.3s ease;
+}
+
+.logo a:hover {
+  color: #ba55d3;
+}
+
+.navLinks {
+  display: flex;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  gap: 2rem;
+}
+
+.navLinks li a {
+  color: #ccc;
+  text-decoration: none;
+  font-size: 1rem;
+  transition: all 0.3s ease;
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+}
+
+.navLinks li a:hover {
+  color: white;
+  background-color: rgba(147, 112, 219, 0.2);
+}
+
+.navLinks li a.active {
+  color: white;
+  background-color: rgba(147, 112, 219, 0.3);
+}
+
+@media (max-width: 768px) {
+  .navigation {
+    flex-direction: column;
+    padding: 1rem;
+  }
+
+  .leftSection {
+    margin-bottom: 1rem;
+    width: 100%;
+    justify-content: center;
+  }
+
+  .logo {
+    margin-bottom: 1rem;
+  }
+
+  .navLinks {
+    width: 100%;
+    justify-content: center;
+    gap: 1rem;
+  }
+}
