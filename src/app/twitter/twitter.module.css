@@ -4,21 +4,21 @@
   padding: 20px;
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica,
     Arial, sans-serif;
-  color: #e6ecf0;
+  color: var(--text-primary);
   position: relative;
 }
 
 .header {
   margin-bottom: 20px;
   padding-bottom: 10px;
-  border-bottom: 1px solid #333;
+  border-bottom: 1px solid var(--border-color);
   display: flex;
   justify-content: space-between;
   align-items: center;
 }
 
 .title {
-  color: #9370db;
+  color: var(--primary-color);
   font-size: 24px;
   font-weight: bold;
   font-family: var(--font-cinzel), serif;
@@ -31,16 +31,16 @@
 }
 
 .postForm {
-  background-color: rgba(30, 30, 30, 0.8);
+  background-color: var(--background-card);
   padding: 20px;
   border-radius: 10px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
-  border: 1px solid #333;
+  box-shadow: var(--box-shadow);
+  border: 1px solid var(--border-color);
 }
 
 .postForm h2 {
   margin-top: 0;
-  color: #9370db;
+  color: var(--primary-color);
   font-size: 18px;
   margin-bottom: 15px;
   font-family: var(--font-cinzel), serif;
@@ -54,18 +54,18 @@
   display: block;
   margin-bottom: 5px;
   font-weight: 500;
-  color: #9370db;
+  color: var(--primary-color);
 }
 
 .input,
 .textarea {
   width: 100%;
   padding: 10px;
-  border: 1px solid #444;
+  border: 1px solid var(--border-color);
   border-radius: 5px;
   font-size: 16px;
-  background-color: #222;
-  color: #e6ecf0;
+  background-color: var(--background-input);
+  color: var(--text-primary);
 }
 
 .textarea {
@@ -75,13 +75,13 @@
 
 .charCount {
   text-align: right;
-  color: #777;
+  color: var(--text-muted);
   font-size: 14px;
   margin-top: 5px;
 }
 
 .button {
-  background-color: #9370db;
+  background-color: var(--primary-color);
   color: white;
   border: none;
   border-radius: 30px;
@@ -93,40 +93,40 @@
 }
 
 .button:hover {
-  background-color: #8a2be2;
+  background-color: var(--secondary-color);
 }
 
 .button:disabled {
-  background-color: #555;
+  background-color: var(--text-muted);
   cursor: not-allowed;
 }
 
 .error {
-  color: #ff6b6b;
+  color: var(--text-error);
   margin-bottom: 15px;
   font-size: 14px;
 }
 
 .timeline {
-  background-color: rgba(30, 30, 30, 0.8);
+  background-color: var(--background-card);
   border-radius: 10px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+  box-shadow: var(--box-shadow);
   overflow: hidden;
-  border: 1px solid #333;
+  border: 1px solid var(--border-color);
 }
 
 .timeline h2 {
   padding: 15px 20px;
   margin: 0;
-  border-bottom: 1px solid #333;
+  border-bottom: 1px solid var(--border-color);
   font-size: 18px;
-  color: #9370db;
+  color: var(--primary-color);
   font-family: var(--font-cinzel), serif;
 }
 
 .noPosts {
   padding: 20px;
-  color: #777;
+  color: var(--text-muted);
   text-align: center;
 }
 
@@ -137,12 +137,12 @@
 
 .post {
   padding: 15px 20px;
-  border-bottom: 1px solid #333;
+  border-bottom: 1px solid var(--border-color);
   transition: background-color 0.2s;
 }
 
 .post:hover {
-  background-color: rgba(40, 40, 40, 0.8);
+  background-color: var(--background-hover);
 }
 
 .post:last-child {
@@ -157,16 +157,16 @@
 
 .nickname {
   font-weight: bold;
-  color: #9370db;
+  color: var(--primary-color);
 }
 
 .date {
-  color: #777;
+  color: var(--text-muted);
   font-size: 14px;
 }
 
 .postContent {
-  color: #e6ecf0;
+  color: var(--text-primary);
   line-height: 1.4;
   white-space: pre-wrap;
   word-wrap: break-word;
@@ -203,9 +203,9 @@
 }
 
 .adminButton {
-  background-color: #333;
-  color: #9370db;
-  border: 1px solid #9370db;
+  background-color: var(--background-input);
+  color: var(--primary-color);
+  border: 1px solid var(--primary-color);
   border-radius: 4px;
   padding: 6px 12px;
   font-size: 14px;
@@ -214,19 +214,19 @@
 }
 
 .adminButton:hover {
-  background-color: #444;
+  background-color: var(--background-hover);
 }
 
 .adminLoginContainer {
-  background-color: rgba(30, 30, 30, 0.9);
+  background-color: var(--background-card);
   padding: 20px;
   border-radius: 10px;
   margin-bottom: 20px;
-  border: 1px solid #9370db;
+  border: 1px solid var(--primary-color);
 }
 
 .adminLoginContainer h2 {
-  color: #9370db;
+  color: var(--primary-color);
   margin-top: 0;
   margin-bottom: 15px;
   font-family: var(--font-cinzel), serif;
@@ -240,8 +240,8 @@
 
 .deleteButton {
   background-color: rgba(220, 53, 69, 0.2);
-  color: #ff6b6b;
-  border: 1px solid #ff6b6b;
+  color: var(--text-error);
+  border: 1px solid var(--text-error);
   border-radius: 4px;
   padding: 4px 8px;
   font-size: 12px;

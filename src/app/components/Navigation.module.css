@@ -4,8 +4,8 @@
   align-items: center;
   padding: 1rem 2rem;
   background-color: rgba(0, 0, 0, 0.8);
-  color: white;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  color: var(--text-primary);
+  border-bottom: 1px solid var(--border-light);
 }
 
 .leftSection {
@@ -19,9 +19,9 @@
 }
 
 .langButton {
-  background: rgba(30, 30, 30, 0.8);
-  color: #ccc;
-  border: 1px solid #444;
+  background: var(--background-input);
+  color: var(--text-secondary);
+  border: 1px solid var(--border-color);
   border-radius: 4px;
   padding: 0.3rem 0.6rem;
   font-size: 0.9rem;
@@ -37,7 +37,7 @@
 .langButton.active {
   background-color: rgba(147, 112, 219, 0.3);
   color: white;
-  border-color: #9370db;
+  border-color: var(--primary-color);
 }
 
 .logo {
@@ -47,13 +47,13 @@
 }
 
 .logo a {
-  color: #9370db;
+  color: var(--primary-color);
   text-decoration: none;
   transition: color 0.3s ease;
 }
 
 .logo a:hover {
-  color: #ba55d3;
+  color: var(--secondary-color);
 }
 
 .navLinks {
@@ -65,7 +65,7 @@
 }
 
 .navLinks li a {
-  color: #ccc;
+  color: var(--text-secondary);
   text-decoration: none;
   font-size: 1rem;
   transition: all 0.3s ease;

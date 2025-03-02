@@ -9,7 +9,7 @@
   flex-direction: column;
   align-items: center;
   padding: 2rem;
-  color: #f0f0f0;
+  color: var(--text-primary);
 }
 
 .header {
@@ -23,27 +23,27 @@
   font-size: 3rem;
   margin-bottom: 1rem;
   font-family: "Cinzel", serif;
-  color: #e0e0e0;
+  color: var(--text-primary);
   text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
   letter-spacing: 2px;
 }
 
 .subtitle {
   font-size: 1.2rem;
-  color: #d0d0d0;
+  color: var(--text-secondary);
   font-style: italic;
   margin-bottom: 1.5rem;
 }
 
 .formContainer {
-  background-color: rgba(30, 30, 30, 0.8);
+  background-color: var(--background-card);
   padding: 2rem;
   border-radius: 12px;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+  box-shadow: var(--box-shadow);
   width: 100%;
   max-width: 800px;
   margin-bottom: 2rem;
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  border: 1px solid var(--border-light);
 }
 
 .form {
@@ -60,7 +60,7 @@
 
 .label {
   font-size: 1.1rem;
-  color: #e0e0e0;
+  color: var(--text-primary);
   font-weight: 500;
 }
 
@@ -69,8 +69,8 @@
   padding: 0.8rem 1rem;
   border-radius: 8px;
   background-color: rgba(255, 255, 255, 0.1);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  color: #ffffff;
+  border: 1px solid var(--border-light);
+  color: var(--text-primary);
   font-size: 1rem;
   transition: all 0.3s ease;
 }
@@ -89,7 +89,11 @@
 }
 
 .button {
-  background: linear-gradient(135deg, #9c27b0, #673ab7);
+  background: linear-gradient(
+    135deg,
+    var(--primary-color),
+    var(--primary-dark)
+  );
   color: white;
   border: none;
   padding: 1rem;
@@ -106,7 +110,11 @@
 .button:hover {
   transform: translateY(-2px);
   box-shadow: 0 6px 16px rgba(0, 0, 0, 0.4);
-  background: linear-gradient(135deg, #b52cc5, #7e57c2);
+  background: linear-gradient(
+    135deg,
+    var(--secondary-color),
+    var(--primary-color)
+  );
 }
 
 .button:active {
@@ -114,7 +122,7 @@
 }
 
 .button:disabled {
-  background: #666;
+  background: var(--text-muted);
   cursor: not-allowed;
   transform: none;
   box-shadow: none;
@@ -133,8 +141,8 @@
   justify-content: center;
   align-items: center;
   min-height: 300px;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: var(--box-shadow);
+  border: 1px solid var(--border-light);
   backdrop-filter: blur(4px);
 }
 
@@ -148,7 +156,7 @@
 }
 
 .error {
-  color: #ff6b6b;
+  color: var(--text-error);
   text-align: center;
   width: 100%;
   align-self: center;
@@ -169,7 +177,7 @@
   justify-content: center;
   align-items: center;
   width: 100%;
-  color: #f5f5f5;
+  color: var(--text-primary);
   text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
 }
 
