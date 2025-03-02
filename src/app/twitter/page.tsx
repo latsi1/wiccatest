@@ -203,21 +203,22 @@ export default function TwitterClone() {
     <div className={styles.container}>
       <header className={styles.header}>
         <h1 className={styles.title}>{translations.title}</h1>
-        <div className={styles.adminControls}>
-          {isAdmin ? (
-            <button className={styles.adminButton} onClick={handleAdminLogout}>
-              {translations.logout}
-            </button>
-          ) : (
-            <button
-              className={styles.adminButton}
-              onClick={() => setShowAdminLogin(!showAdminLogin)}
-            >
-              {translations.adminLogin}
-            </button>
-          )}
-        </div>
       </header>
+
+      <div className={styles.adminControls}>
+        {isAdmin ? (
+          <button className={styles.adminButton} onClick={handleAdminLogout}>
+            {translations.logout}
+          </button>
+        ) : (
+          <button
+            className={styles.adminButton}
+            onClick={() => setShowAdminLogin(!showAdminLogin)}
+          >
+            {translations.adminLogin}
+          </button>
+        )}
+      </div>
 
       {showAdminLogin && !isAdmin && (
         <div className={styles.adminLoginContainer}>
