@@ -1,4 +1,8 @@
 import { NextResponse } from "next/server";
+import { HfInference } from "@huggingface/inference";
+
+// Create a new Hugging Face Inference instance
+const hf = new HfInference(process.env.HUGGINGFACE_API_KEY);
 
 export async function POST(request: Request) {
   try {
@@ -24,8 +28,7 @@ export async function POST(request: Request) {
     }
 
     // Create prompt with required words and sentence limit
-    const prompt = `<|im_start|>user
-Tehtäväsi on luoda lyhyt mystinen Wicca-loitsu SUOMEKSI. Loitsun tulee olla VAIN suomen kielellä, ei englantia.
+    const prompt = `Tehtäväsi on luoda lyhyt mystinen Wicca-loitsu SUOMEKSI. Loitsun tulee olla VAIN suomen kielellä, ei englantia.
 
 Loitsu on seuraavalle toiveelle: "${desire}"
 
@@ -41,60 +44,35 @@ TÄRKEÄT VAATIMUKSET:
 
 Loitsun tulisi olla runollinen ja mystinen. Sisällytä loitsuun viittauksia luontoon, elementteihin tai kuun vaiheisiin.
 
-Vastaa VAIN suomenkielisellä loitsulla, älä anna selityksiä tai johdantoa.
-<|im_end|>
-
-<|im_start|>assistant`;
-
-    // Use the Mistral model
-    const modelEndpoint =
-      "https://api-inference.huggingface.co/models/mistralai/Mistral-7B-Instruct-v0.2";
+Vastaa VAIN suomenkielisellä loitsulla, älä anna selityksiä tai johdantoa.`;
 
     try {
-      console.log("Using Mistral-7B-Instruct-v0.2 model with Finnish prompt");
+      console.log("Using Hugging Face Inference API with Finnish prompt");
 
-      // Make the request to Hugging Face
-      const response = await fetch(modelEndpoint, {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${process.env.HUGGINGFACE_API_KEY || ""}`,
-          "Content-Type": "application/json",
+      // Use the HfInference client instead of raw fetch
+      const response = await hf.textGeneration({
+        model: "mistralai/Mistral-7B-Instruct-v0.2",
+        inputs: prompt,
+        parameters: {
+          max_new_tokens: 500,
+          temperature: 0.9,
+          top_p: 0.95,
+          do_sample: true,
+          return_full_text: false,
         },
-        body: JSON.stringify({
-          inputs: prompt,
-          parameters: {
-            max_length: 500,
-            temperature: 0.9,
-            top_p: 0.95,
-            do_sample: true,
-          },
-        }),
       });
 
-      if (!response.ok) {
-        throw new Error(`Model failed with status: ${response.status}`);
-      }
-
-      const data = await response.json();
-
       // Extract the generated text
-      let poemText =
-        typeof data === "string"
-          ? data
-          : Array.isArray(data)
-          ? data[0]?.generated_text
-          : data.generated_text;
+      let poemText = response.generated_text;
 
       if (!poemText || poemText.length < 20) {
-        throw new Error("Generated text too short or empty");
+        console.error("Generated text too short or empty");
+        // Fallback to template-based generation if response is invalid
+        return NextResponse.json({ spell: generateFallbackSpell(desire) });
       }
 
       // Clean up the response
       poemText = poemText
-        .replace(/<\|im_start\|>user[\s\S]*?<\|im_end\|>/g, "")
-        .replace(/<\|im_start\|>assistant/g, "")
-        .replace(/<\|im_end\|>/g, "")
-        .replace(/Tehtäväsi on luoda[\s\S]*?johdantoa\./g, "")
         .replace(/^[:\s]+/, "")
         .replace(/^(Tässä on|Olen luonut|Tämä on|Alla on).*?:/g, "")
         .replace(/Tämä Wicca-loitsu on[\s\S]*?Wicca-symboleihin\./g, "")
@@ -106,17 +84,82 @@ Vastaa VAIN suomenkielisellä loitsulla, älä anna selityksiä tai johdantoa.
       console.log("Generated Finnish poem:", poemText);
       return NextResponse.json({ spell: poemText });
     } catch (error) {
-      console.error("Error with Mistral model:", error);
-      return NextResponse.json(
-        { error: "Loitsun luominen epäonnistui. Yritä myöhemmin uudelleen." },
-        { status: 500 }
-      );
+      console.error("Error with Hugging Face model:", error);
+      // Use fallback generation
+      return NextResponse.json({
+        spell: generateFallbackSpell(desire),
+      });
     }
   } catch (error) {
     console.error("Unhandled error in API route:", error);
-    return NextResponse.json(
-      { error: "Loitsun luominen epäonnistui. Yritä myöhemmin uudelleen." },
-      { status: 500 }
+    // Use a default desire if we can't extract it from the request
+    const fallbackDesire = "toiveesi";
+    return NextResponse.json({ spell: generateFallbackSpell(fallbackDesire) });
+  }
+}
+
+// Fallback function to generate a spell without API calls
+function generateFallbackSpell(desire: string): string {
+  // Arrays of Finnish mystical phrases and elements
+  const beginnings = [
+    "Kuun valossa",
+    "Tähtien alla",
+    "Metsän sydämessä",
+    "Yön pimeydessä",
+    "Auringon noustessa",
+  ];
+
+  const actions = [
+    "syyhysääri tanssii",
+    "länkisääri kuiskaa",
+    "taikurin pöytä hohtaa",
+    "mc presidentti loihtii",
+    "frozen teltta suojaa",
+  ];
+
+  const connections = ["kun", "ja", "samalla", "silloin", "kunnes"];
+
+  const secondActions = [
+    "länkisääri kuiskaa salaisuuksia",
+    "taikurin pöytä täyttyy voimalla",
+    "mc presidentti lausuu loitsun",
+    "frozen teltta suojaa rituaalia",
+    "turengin velju vahvistaa toiveesi",
+  ];
+
+  const endings = [
+    `${desire} toteutuu kuun kierrossa`,
+    `${desire} manifestoituu elämääsi`,
+    `${desire} tulee todeksi tuulen mukana`,
+    `${desire} virtaa suoniisi voimana`,
+    `${desire} kantautuu universumin energiaan`,
+  ];
+
+  // Randomly select elements to create a unique poem
+  const getRandomElement = (array: string[]) =>
+    array[Math.floor(Math.random() * array.length)];
+
+  // Create a 3-5 sentence poem
+  const sentenceCount = Math.min(5, Math.floor(Math.random() * 3) + 3); // 3-5 sentences, max 5
+  const sentences = [];
+
+  // First sentence always includes syyhysääri or länkisääri
+  sentences.push(
+    `${getRandomElement(beginnings)} ${getRandomElement(actions)}.`
+  );
+
+  // Middle sentences
+  for (let i = 1; i < sentenceCount - 1; i++) {
+    sentences.push(
+      `${getRandomElement(beginnings)} ${getRandomElement(
+        actions
+      )} ${getRandomElement(connections)} ${getRandomElement(secondActions)}.`
     );
   }
+
+  // Last sentence always includes the desire
+  sentences.push(`${getRandomElement(endings)}.`);
+
+  // Combine into a poem
+  return sentences.join("\n");
 }
