@@ -4,6 +4,7 @@ import React, { useState, useEffect, useCallback } from "react";
 import styles from "./wiccer.module.css";
 import { useLanguage } from "../context/LanguageContext";
 import LoadingText from "../components/LoadingText";
+import WiccaBanner from "../components/WiccaBanner";
 
 interface Post {
   id: number;
@@ -599,6 +600,7 @@ export default function WiccerPage() {
 
   return (
     <div className={styles.container}>
+      <WiccaBanner />
       <header className={styles.header}>
         <h1 className={styles.title}>{translations.title}</h1>
       </header>

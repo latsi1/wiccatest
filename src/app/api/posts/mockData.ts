@@ -75,9 +75,7 @@ export const mockWiccaPosts = [
     nickname: "Tarja eli Tarja2",
     content:
       "Tänään tein erikoista wicca-keittoa! Resepti: 2 dl kuunvaloa, 1 rkl tähdenpölyä, 3 dl syyhysääriä, 1 kpl länkisääriä, 1 tl taikurin pöydän suolaa. Keitä kuunvalo ja tähdenpöly ensin, lisää sitten syyhysääri ja länkisääri. Mausta taikurin pöydän suolalla. Tarjoa frozen teltassa! 🌙✨",
-    created_at: new Date(
-      Date.now() - Math.random() * 7 * 24 * 60 * 60 * 1000
-    ).toISOString(),
+    created_at: new Date(Date.now()).toISOString(),
     votes: Math.floor(Math.random() * 21) - 10,
   },
   {
@@ -85,9 +83,7 @@ export const mockWiccaPosts = [
     nickname: "hissifin",
     content:
       "Kaluston veivaus on tärkeä osa wicca-rituaaleja! Tänään veivasin taco-rituaalini kaluston uudelleen. Muista aina taco wicca rituaaleissa käyttää oikeaa kaluston sijoittelua - se on perusjuttu! Lisäsin myös uuden MC kerho Pohjosen elementin rituaaliini. Toimiiko kukaan muu näin? 🪑✨",
-    created_at: new Date(
-      Date.now() - Math.random() * 7 * 24 * 60 * 60 * 1000
-    ).toISOString(),
+    created_at: new Date(Date.now()).toISOString(),
     votes: Math.floor(Math.random() * 21) - 10,
   },
   {
@@ -95,9 +91,7 @@ export const mockWiccaPosts = [
     nickname: "Vorhala",
     content:
       "Frozen teltta on paras paikka wicca-rituaaleihin! MC kerho Pohjosen kanssa teimme tänään erityisen rituaalin frozen teltassa. Se oli ihan mahtavaa! Muista aina varata frozen teltta etukäteen, koska se on suosittu paikka. MC kerho Pohjosen elementit toimivat erityisen hyvin frozen teltassa! 🏕️✨",
-    created_at: new Date(
-      Date.now() - Math.random() * 7 * 24 * 60 * 60 * 1000
-    ).toISOString(),
+    created_at: new Date(Date.now()).toISOString(),
     votes: Math.floor(Math.random() * 21) - 10,
   },
   {
