@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import styles from "./wiccer.module.css";
 import { useLanguage } from "../context/LanguageContext";
 import LoadingText from "../components/LoadingText";
@@ -17,16 +17,16 @@ interface Post {
 
 export default function WiccerPage() {
   const [posts, setPosts] = useState<Post[]>([]);
-  const [nickname, setNickname] = useState("");
-  const [content, setContent] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
+  const [newPost, setNewPost] = useState({ nickname: "", content: "" });
+  const [replyTo, setReplyTo] = useState<number | null>(null);
+  const [replyContent, setReplyContent] = useState("");
+  const [isLoading, setIsLoading] = useState(true);
   const [isLoadingPosts, setIsLoadingPosts] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const { language } = useLanguage();
 
   // Reply state
   const [replyingTo, setReplyingTo] = useState<number | null>(null);
-  const [replyContent, setReplyContent] = useState("");
   const [replyNickname, setReplyNickname] = useState("");
 
   // Admin state
@@ -37,10 +37,24 @@ export default function WiccerPage() {
   const [adminError, setAdminError] = useState<string | null>(null);
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("desc");
 
-  // Voting state
-  const [votingPosts, setVotingPosts] = useState<
-    Record<number, "up" | "down" | null>
-  >({});
+  // Function to fetch posts from the API
+  const fetchPosts = useCallback(async () => {
+    try {
+      setIsLoadingPosts(true);
+      const response = await fetch("/api/posts");
+      if (!response.ok) {
+        throw new Error("Failed to fetch posts");
+      }
+      const data = await response.json();
+      setPosts(data.posts);
+    } catch (error) {
+      console.error("Error fetching posts:", error);
+      setError("Failed to load posts");
+    } finally {
+      setIsLoadingPosts(false);
+      setIsLoading(false);
+    }
+  }, []);
 
   // Fetch posts when the component mounts
   useEffect(() => {
@@ -51,35 +65,13 @@ export default function WiccerPage() {
     if (savedAdminStatus === "true") {
       setIsAdmin(true);
     }
-  }, []);
-
-  // Function to fetch posts from the API
-  const fetchPosts = async () => {
-    setIsLoadingPosts(true);
-    try {
-      const response = await fetch("/api/posts");
-      if (!response.ok) {
-        throw new Error("Failed to fetch posts");
-      }
-      const data = await response.json();
-      setPosts(data.posts);
-    } catch (error) {
-      console.error("Error fetching posts:", error);
-      setError(
-        language === "finnish"
-          ? "Viestien lataaminen epäonnistui. Yritä myöhemmin uudelleen."
-          : "Failed to load posts. Please try again later."
-      );
-    } finally {
-      setIsLoadingPosts(false);
-    }
-  };
+  }, [fetchPosts]);
 
   // Function to handle form submission
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!nickname.trim() || !content.trim()) {
+    if (!newPost.nickname.trim() || !newPost.content.trim()) {
       setError(
         language === "finnish"
           ? "Nimimerkki ja viesti ovat pakollisia"
@@ -97,7 +89,7 @@ export default function WiccerPage() {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ nickname, content }),
+        body: JSON.stringify(newPost),
       });
 
       if (!response.ok) {
@@ -116,7 +108,7 @@ export default function WiccerPage() {
       ]);
 
       // Clear the form
-      setContent("");
+      setNewPost({ nickname: "", content: "" });
     } catch (error) {
       console.error("Error creating post:", error);
       setError(
@@ -661,8 +653,10 @@ export default function WiccerPage() {
               <input
                 type="text"
                 id="nickname"
-                value={nickname}
-                onChange={(e) => setNickname(e.target.value)}
+                value={newPost.nickname}
+                onChange={(e) =>
+                  setNewPost({ ...newPost, nickname: e.target.value })
+                }
                 placeholder={translations.enterNickname}
                 required
                 className={styles.input}
@@ -672,14 +666,18 @@ export default function WiccerPage() {
               <label htmlFor="content">{translations.message}</label>
               <textarea
                 id="content"
-                value={content}
-                onChange={(e) => setContent(e.target.value)}
+                value={newPost.content}
+                onChange={(e) =>
+                  setNewPost({ ...newPost, content: e.target.value })
+                }
                 placeholder={translations.shareThoughts}
                 required
                 className={styles.textarea}
                 maxLength={280}
               />
-              <div className={styles.charCount}>{content.length}/280</div>
+              <div className={styles.charCount}>
+                {newPost.content.length}/280
+              </div>
             </div>
             {error && <div className={styles.error}>{error}</div>}
             <button

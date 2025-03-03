@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import styles from "./twitter.module.css";
 import { useLanguage } from "../context/LanguageContext";
 import LoadingText from "../components/LoadingText";
@@ -28,21 +28,10 @@ export default function TwitterClone() {
   const [isAdmin, setIsAdmin] = useState(false);
   const [adminError, setAdminError] = useState<string | null>(null);
 
-  // Fetch posts when the component mounts
-  useEffect(() => {
-    fetchPosts();
-
-    // Check if admin is already logged in (from localStorage)
-    const savedAdminStatus = localStorage.getItem("wiccersAdminLoggedIn");
-    if (savedAdminStatus === "true") {
-      setIsAdmin(true);
-    }
-  }, []);
-
   // Function to fetch posts from the API
-  const fetchPosts = async () => {
-    setIsLoadingPosts(true);
+  const fetchPosts = useCallback(async () => {
     try {
+      setIsLoadingPosts(true);
       const response = await fetch("/api/posts");
       if (!response.ok) {
         throw new Error("Failed to fetch posts");
@@ -58,8 +47,20 @@ export default function TwitterClone() {
       );
     } finally {
       setIsLoadingPosts(false);
+      setIsLoading(false);
     }
-  };
+  }, [language]);
+
+  // Fetch posts when the component mounts
+  useEffect(() => {
+    fetchPosts();
+
+    // Check if admin is already logged in (from localStorage)
+    const savedAdminStatus = localStorage.getItem("wiccersAdminLoggedIn");
+    if (savedAdminStatus === "true") {
+      setIsAdmin(true);
+    }
+  }, [fetchPosts]);
 
   // Function to handle form submission
   const handleSubmit = async (e: React.FormEvent) => {

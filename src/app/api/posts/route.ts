@@ -155,7 +155,7 @@ export async function GET() {
 // POST handler to create a new post or reply
 export async function POST(request: Request) {
   try {
-    const { nickname, content, parentId, parent_id } = await request.json();
+    const { nickname, content, parentId } = await request.json();
 
     // Validate input
     if (!nickname || !content) {
