@@ -204,6 +204,7 @@
   gap: 10px;
   margin-top: 10px;
   align-items: center;
+  flex-wrap: wrap;
 }
 
 .voteButtons {
@@ -263,10 +264,18 @@
   font-size: 12px;
   cursor: pointer;
   transition: all 0.2s;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 60px;
+  height: 24px;
+  margin-left: 8px;
 }
 
 .replyButton:hover {
   background-color: var(--background-hover);
+  color: var(--secondary-color);
+  border-color: var(--secondary-color);
 }
 
 .replyForm {
@@ -384,6 +393,11 @@
   font-size: 12px;
   cursor: pointer;
   transition: all 0.2s;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 60px;
+  height: 24px;
 }
 
 .deleteButton:hover {

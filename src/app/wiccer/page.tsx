@@ -40,6 +40,7 @@ export default function WiccerPage() {
   const fetchPosts = useCallback(async () => {
     try {
       setIsLoadingPosts(true);
+      setError(null);
       const response = await fetch("/api/posts");
       if (!response.ok) {
         throw new Error("Failed to fetch posts");
@@ -434,6 +435,7 @@ export default function WiccerPage() {
   // Function to render a post and its replies recursively
   const renderPost = (post: Post, level: number = 0) => {
     const voteStatus = getVoteStatus(post.id);
+    console.log("Rendering post:", post.id, "with level:", level);
     return (
       <div
         key={post.id}
@@ -477,7 +479,10 @@ export default function WiccerPage() {
           )}
           <button
             className={styles.replyButton}
-            onClick={() => setReplyingTo(post.id)}
+            onClick={() => {
+              console.log("Reply button clicked for post:", post.id);
+              setReplyingTo(post.id);
+            }}
           >
             {translations.reply}
           </button>
@@ -517,7 +522,7 @@ export default function WiccerPage() {
                   {replyContent.length}/280
                 </div>
               </div>
-              <div className={styles.replyActions}>
+              <div className={styles.formActions}>
                 <button
                   type="submit"
                   disabled={isLoading}
@@ -528,7 +533,11 @@ export default function WiccerPage() {
                 <button
                   type="button"
                   className={styles.cancelButton}
-                  onClick={() => setReplyingTo(null)}
+                  onClick={() => {
+                    setReplyingTo(null);
+                    setReplyContent("");
+                    setReplyNickname("");
+                  }}
                 >
                   {translations.cancel}
                 </button>

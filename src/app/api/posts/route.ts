@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { Pool } from "pg";
+import { Pool, PoolClient } from "pg";
 import { mockWiccaPosts } from "./mockData";
 
 interface Post {
@@ -7,8 +7,9 @@ interface Post {
   nickname: string;
   content: string;
   created_at: string;
-  parent_id: number | null;
-  replies: Post[];
+  parent_id?: number | null;
+  votes: number;
+  replies?: Post[];
 }
 
 // Create a connection pool to the Neon database
@@ -18,6 +19,27 @@ const pool = new Pool({
     rejectUnauthorized: false,
   },
 });
+
+// Recursive function to insert a post and its replies
+async function insertPost(
+  client: PoolClient,
+  post: Post,
+  parentId: number | null = null
+) {
+  const randomVotes = Math.floor(Math.random() * 21) - 10;
+  const result = await client.query(
+    "INSERT INTO posts (nickname, content, created_at, votes, parent_id) VALUES ($1, $2, $3, $4, $5) RETURNING id",
+    [post.nickname, post.content, post.created_at, randomVotes, parentId]
+  );
+  const newId = result.rows[0].id;
+
+  // Recursively insert all replies
+  if (post.replies && post.replies.length > 0) {
+    for (const reply of post.replies) {
+      await insertPost(client, reply, newId);
+    }
+  }
+}
 
 // Initialize the database table if it doesn't exist
 async function initializeDatabase() {
@@ -45,20 +67,16 @@ async function initializeDatabase() {
     const result = await client.query("SELECT COUNT(*) FROM posts");
     const count = parseInt(result.rows[0].count);
 
-    // If no posts exist, insert the mock data
+    // If no posts exist, insert the mock data recursively
     if (count === 0) {
       console.log("No posts found in database. Adding mock data...");
 
       // Use a transaction to ensure all inserts succeed or fail together
       await client.query("BEGIN");
 
+      // Insert all posts recursively
       for (const post of mockWiccaPosts) {
-        // Generate random votes for each post
-        const randomVotes = Math.floor(Math.random() * 21) - 10;
-        await client.query(
-          "INSERT INTO posts (nickname, content, created_at, votes) VALUES ($1, $2, $3, $4)",
-          [post.nickname, post.content, post.created_at, randomVotes]
-        );
+        await insertPost(client, post);
       }
 
       await client.query("COMMIT");
@@ -84,70 +102,60 @@ export async function GET() {
   try {
     const client = await pool.connect();
     try {
-      // Fetch all posts with their replies
       const result = await client.query(`
         WITH RECURSIVE post_tree AS (
-          -- Get all root posts (posts without parent)
-          SELECT 
-            p.*,
-            ARRAY[p.id] as path,
-            ARRAY[p.created_at] as created_at_path,
-            ARRAY[p.votes] as votes_path
-          FROM posts p
+          SELECT
+            id,
+            nickname,
+            content,
+            created_at,
+            parent_id,
+            votes,
+            0 AS level,
+            ARRAY[id] AS path
+          FROM posts
           WHERE parent_id IS NULL
-          
+
           UNION ALL
-          
-          -- Get all replies
-          SELECT 
-            p.*,
-            pt.path || p.id,
-            pt.created_at_path || p.created_at,
-            pt.votes_path || p.votes
+
+          SELECT
+            p.id,
+            p.nickname,
+            p.content,
+            p.created_at,
+            p.parent_id,
+            p.votes,
+            pt.level + 1,
+            pt.path || p.id
           FROM posts p
-          JOIN post_tree pt ON p.parent_id = pt.id
+          INNER JOIN post_tree pt ON p.parent_id = pt.id
         )
-        SELECT 
-          id,
-          nickname,
-          content,
-          created_at,
-          parent_id,
-          votes,
-          path,
-          created_at_path,
-          votes_path
-        FROM post_tree
-        ORDER BY path;
+        SELECT * FROM post_tree ORDER BY path;
       `);
 
-      // Transform the flat structure into a tree
-      const posts = result.rows.reduce((acc: Post[], post) => {
-        if (post.parent_id === null) {
-          acc.push({
-            ...post,
-            replies: [],
-          });
-        } else {
-          const parent = acc.find((p: Post) => p.id === post.parent_id);
-          if (parent) {
-            parent.replies.push({
-              ...post,
-              replies: [],
-            });
-          }
-        }
-        return acc;
-      }, []);
+      const postsMap = new Map<number, Post>();
+      const rootPosts: Post[] = [];
 
-      return NextResponse.json({ posts });
+      result.rows.forEach((post: Post) => {
+        post.replies = [];
+        postsMap.set(post.id, post);
+
+        if (post.parent_id) {
+          const parent = postsMap.get(post.parent_id);
+          if (parent) {
+            parent.replies!.push(post);
+          }
+        } else {
+          rootPosts.push(post);
+        }
+      });
+
+      return NextResponse.json({ posts: rootPosts });
     } finally {
       client.release();
     }
   } catch (error) {
     console.error("Error fetching posts:", error);
-    // Return mock data if database connection fails or in development mode
-    console.log("Using mock data for posts");
     return NextResponse.json({ posts: mockWiccaPosts });
   }
 }
@@ -155,7 +163,7 @@ export async function GET() {
 // POST handler to create a new post or reply
 export async function POST(request: Request) {
   try {
-    const { nickname, content, parentId } = await request.json();
+    const { nickname, content, parent_id } = await request.json();
 
     // Validate input
     if (!nickname || !content) {
@@ -170,17 +178,34 @@ export async function POST(request: Request) {
       const result = await client.query(
         `INSERT INTO posts (nickname, content, parent_id, votes) 
          VALUES ($1, $2, $3, 0) 
-         RETURNING *`,
-        [nickname, content, parentId || null]
+         RETURNING id, nickname, content, created_at, parent_id, votes`,
+        [nickname, content, parent_id || null]
       );
-      return NextResponse.json({ post: result.rows[0] });
+
+      if (result.rows.length === 0) {
+        throw new Error("Failed to create post");
+      }
+
+      const post = result.rows[0];
+      return NextResponse.json({
+        post: {
+          ...post,
+          replies: [],
+        },
+      });
+    } catch (error) {
+      console.error("Error creating post:", error);
+      return NextResponse.json(
+        { error: "Failed to create post" },
+        { status: 500 }
+      );
     } finally {
       client.release();
     }
   } catch (error) {
-    console.error("Error creating post:", error);
+    console.error("Error in POST handler:", error);
     return NextResponse.json(
-      { error: "Failed to create post" },
+      { error: "Internal server error" },
       { status: 500 }
     );
   }
