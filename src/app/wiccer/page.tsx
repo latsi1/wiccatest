@@ -10,6 +10,9 @@ interface Post {
   nickname: string;
   content: string;
   created_at: string;
+  parent_id: number | null;
+  replies: Post[];
+  votes: number;
 }
 
 export default function WiccerPage() {
@@ -21,12 +24,23 @@ export default function WiccerPage() {
   const [error, setError] = useState<string | null>(null);
   const { language } = useLanguage();
 
+  // Reply state
+  const [replyingTo, setReplyingTo] = useState<number | null>(null);
+  const [replyContent, setReplyContent] = useState("");
+  const [replyNickname, setReplyNickname] = useState("");
+
   // Admin state
   const [showAdminLogin, setShowAdminLogin] = useState(false);
   const [adminUsername, setAdminUsername] = useState("");
   const [adminPassword, setAdminPassword] = useState("");
   const [isAdmin, setIsAdmin] = useState(false);
   const [adminError, setAdminError] = useState<string | null>(null);
+  const [sortOrder, setSortOrder] = useState<"asc" | "desc">("desc");
+
+  // Voting state
+  const [votingPosts, setVotingPosts] = useState<
+    Record<number, "up" | "down" | null>
+  >({});
 
   // Fetch posts when the component mounts
   useEffect(() => {
@@ -90,17 +104,98 @@ export default function WiccerPage() {
         throw new Error("Failed to create post");
       }
 
+      const { post } = await response.json();
+
+      // Add the new post to the beginning of the posts array
+      setPosts((prevPosts) => [
+        {
+          ...post,
+          replies: [],
+        },
+        ...prevPosts,
+      ]);
+
       // Clear the form
       setContent("");
-
-      // Refresh the posts
-      fetchPosts();
     } catch (error) {
       console.error("Error creating post:", error);
       setError(
         language === "finnish"
           ? "Viestin lähettäminen epäonnistui. Yritä uudelleen."
           : "Failed to create post. Please try again."
+      );
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // Function to handle reply submission
+  const handleReplySubmit = async (e: React.FormEvent, parentId: number) => {
+    e.preventDefault();
+
+    if (!replyNickname.trim() || !replyContent.trim()) {
+      setError(
+        language === "finnish"
+          ? "Nimimerkki ja vastaus ovat pakollisia"
+          : "Nickname and reply are required"
+      );
+      return;
+    }
+
+    setIsLoading(true);
+    setError(null);
+
+    try {
+      const response = await fetch("/api/posts", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          nickname: replyNickname,
+          content: replyContent,
+          parent_id: parentId,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to create reply");
+      }
+
+      const { post } = await response.json();
+
+      // Update posts state to add the new reply
+      setPosts((prevPosts) => {
+        const updatePost = (posts: Post[]): Post[] => {
+          return posts.map((p) => {
+            if (p.id === parentId) {
+              return {
+                ...p,
+                replies: [...p.replies, { ...post, replies: [] }],
+              };
+            }
+            if (p.replies.length > 0) {
+              return {
+                ...p,
+                replies: updatePost(p.replies),
+              };
+            }
+            return p;
+          });
+        };
+        return updatePost(prevPosts);
+      });
+
+      // Clear the form and close reply section
+      setReplyContent("");
+      setReplyNickname("");
+      setReplyingTo(null);
+    } catch (error) {
+      console.error("Error creating reply:", error);
+      setError(
+        language === "finnish"
+          ? "Vastauksen lähettäminen epäonnistui. Yritä uudelleen."
+          : "Failed to create reply. Please try again."
       );
     } finally {
       setIsLoading(false);
@@ -136,6 +231,20 @@ export default function WiccerPage() {
     localStorage.removeItem("wiccersAdminLoggedIn");
   };
 
+  // Function to sort posts by date
+  const sortPosts = (posts: Post[], order: "asc" | "desc"): Post[] => {
+    return [...posts].sort((a, b) => {
+      const dateA = new Date(a.created_at).getTime();
+      const dateB = new Date(b.created_at).getTime();
+      return order === "asc" ? dateA - dateB : dateB - dateA;
+    });
+  };
+
+  // Function to handle sort order toggle
+  const handleSortToggle = () => {
+    setSortOrder((prev) => (prev === "asc" ? "desc" : "asc"));
+  };
+
   // Function to delete a post
   const handleDeletePost = async (postId: number) => {
     if (!isAdmin) return;
@@ -156,6 +265,169 @@ export default function WiccerPage() {
     }
   };
 
+  // Function to handle voting
+  const handleVote = async (postId: number, vote: "up" | "down") => {
+    // Get existing votes from localStorage
+    const existingVotes = JSON.parse(localStorage.getItem("postVotes") || "{}");
+    console.log("Current votes:", existingVotes);
+    console.log("Attempting to vote:", { postId, vote });
+
+    // If user has already voted on this post
+    if (existingVotes[postId]) {
+      console.log("Already voted:", existingVotes[postId]);
+
+      // If clicking the same button again, remove the vote
+      if (existingVotes[postId] === vote) {
+        console.log("Removing vote");
+        const response = await fetch("/api/posts", {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            id: postId,
+            vote: vote === "up" ? "down" : "up",
+            undo: true,
+            voteValue: vote === "up" ? -1 : 1, // Add voteValue to specify how much to change
+          }),
+        });
+
+        if (!response.ok) {
+          throw new Error("Failed to update vote");
+        }
+
+        const { post } = await response.json();
+
+        // Update posts state
+        setPosts((prevPosts) => {
+          const updatePost = (posts: Post[]): Post[] => {
+            return posts.map((p) => {
+              if (p.id === postId) {
+                return {
+                  ...p,
+                  votes: post.votes,
+                };
+              }
+              if (p.replies.length > 0) {
+                return {
+                  ...p,
+                  replies: updatePost(p.replies),
+                };
+              }
+              return p;
+            });
+          };
+          return updatePost(prevPosts);
+        });
+
+        // Remove vote from localStorage
+        delete existingVotes[postId];
+        localStorage.setItem("postVotes", JSON.stringify(existingVotes));
+      } else {
+        // If clicking the opposite button, change the vote
+        console.log("Changing vote from", existingVotes[postId], "to", vote);
+        const response = await fetch("/api/posts", {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            id: postId,
+            vote,
+            change: true,
+          }),
+        });
+
+        if (!response.ok) {
+          throw new Error("Failed to update vote");
+        }
+
+        const { post } = await response.json();
+
+        // Update posts state
+        setPosts((prevPosts) => {
+          const updatePost = (posts: Post[]): Post[] => {
+            return posts.map((p) => {
+              if (p.id === postId) {
+                return {
+                  ...p,
+                  votes: post.votes,
+                };
+              }
+              if (p.replies.length > 0) {
+                return {
+                  ...p,
+                  replies: updatePost(p.replies),
+                };
+              }
+              return p;
+            });
+          };
+          return updatePost(prevPosts);
+        });
+
+        // Update vote in localStorage
+        existingVotes[postId] = vote;
+        localStorage.setItem("postVotes", JSON.stringify(existingVotes));
+      }
+    } else {
+      // If no previous vote, add new vote
+      console.log("Adding new vote:", vote);
+      const response = await fetch("/api/posts", {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ id: postId, vote }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to update vote");
+      }
+
+      const { post } = await response.json();
+
+      // Update posts state
+      setPosts((prevPosts) => {
+        const updatePost = (posts: Post[]): Post[] => {
+          return posts.map((p) => {
+            if (p.id === postId) {
+              return {
+                ...p,
+                votes: post.votes,
+              };
+            }
+            if (p.replies.length > 0) {
+              return {
+                ...p,
+                replies: updatePost(p.replies),
+              };
+            }
+            return p;
+          });
+        };
+        return updatePost(prevPosts);
+      });
+
+      // Save vote to localStorage
+      existingVotes[postId] = vote;
+      localStorage.setItem("postVotes", JSON.stringify(existingVotes));
+    }
+  };
+
+  // Function to get vote status for a post
+  const getVoteStatus = (postId: number): "up" | "down" | null => {
+    try {
+      const existingVotes = JSON.parse(
+        localStorage.getItem("postVotes") || "{}"
+      );
+      return existingVotes[postId] || null;
+    } catch (error) {
+      console.error("Error getting vote status:", error);
+      return null;
+    }
+  };
+
   // Format date to a readable string
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
@@ -166,6 +438,121 @@ export default function WiccerPage() {
       hour: "2-digit",
       minute: "2-digit",
     });
+  };
+
+  // Function to render a post and its replies recursively
+  const renderPost = (post: Post, level: number = 0) => {
+    const voteStatus = getVoteStatus(post.id);
+    return (
+      <div
+        key={post.id}
+        className={styles.post}
+        style={{ marginLeft: `${level * 20}px` }}
+      >
+        <div className={styles.postHeader}>
+          <span className={styles.nickname}>{post.nickname}</span>
+          <span className={styles.date}>{formatDate(post.created_at)}</span>
+        </div>
+        <div className={styles.postContent}>{post.content}</div>
+        <div className={styles.postActions}>
+          <div className={styles.voteButtons}>
+            <button
+              className={`${styles.voteButton} ${
+                voteStatus === "up" ? styles.voteButtonActive : ""
+              }`}
+              onClick={() => handleVote(post.id, "up")}
+              title={translations.upvote}
+            >
+              ↑
+            </button>
+            <span className={styles.voteCount}>{post.votes}</span>
+            <button
+              className={`${styles.voteButton} ${
+                voteStatus === "down" ? styles.voteButtonActive : ""
+              }`}
+              onClick={() => handleVote(post.id, "down")}
+              title={translations.downvote}
+            >
+              ↓
+            </button>
+          </div>
+          {isAdmin && (
+            <button
+              className={styles.deleteButton}
+              onClick={() => handleDeletePost(post.id)}
+            >
+              {translations.delete}
+            </button>
+          )}
+          <button
+            className={styles.replyButton}
+            onClick={() => setReplyingTo(post.id)}
+          >
+            {translations.reply}
+          </button>
+        </div>
+
+        {replyingTo === post.id && (
+          <div className={styles.replyForm}>
+            <form onSubmit={(e) => handleReplySubmit(e, post.id)}>
+              <div className={styles.formGroup}>
+                <label htmlFor={`replyNickname-${post.id}`}>
+                  {translations.nickname}
+                </label>
+                <input
+                  type="text"
+                  id={`replyNickname-${post.id}`}
+                  value={replyNickname}
+                  onChange={(e) => setReplyNickname(e.target.value)}
+                  placeholder={translations.enterNickname}
+                  required
+                  className={styles.input}
+                />
+              </div>
+              <div className={styles.formGroup}>
+                <label htmlFor={`replyContent-${post.id}`}>
+                  {translations.reply}
+                </label>
+                <textarea
+                  id={`replyContent-${post.id}`}
+                  value={replyContent}
+                  onChange={(e) => setReplyContent(e.target.value)}
+                  placeholder={translations.writeReply}
+                  required
+                  className={styles.textarea}
+                  maxLength={280}
+                />
+                <div className={styles.charCount}>
+                  {replyContent.length}/280
+                </div>
+              </div>
+              <div className={styles.replyActions}>
+                <button
+                  type="submit"
+                  disabled={isLoading}
+                  className={styles.button}
+                >
+                  {isLoading ? translations.sending : translations.send}
+                </button>
+                <button
+                  type="button"
+                  className={styles.cancelButton}
+                  onClick={() => setReplyingTo(null)}
+                >
+                  {translations.cancel}
+                </button>
+              </div>
+            </form>
+          </div>
+        )}
+
+        {post.replies && post.replies.length > 0 && (
+          <div className={styles.replies}>
+            {post.replies.map((reply) => renderPost(reply, level + 1))}
+          </div>
+        )}
+      </div>
+    );
   };
 
   const translations = {
@@ -197,6 +584,17 @@ export default function WiccerPage() {
     logout: language === "finnish" ? "Kirjaudu ulos" : "Logout",
     delete: language === "finnish" ? "Poista" : "Delete",
     adminPanel: language === "finnish" ? "Ylläpitäjän paneeli" : "Admin Panel",
+    reply: language === "finnish" ? "Vastaa" : "Reply",
+    writeReply:
+      language === "finnish"
+        ? "Kirjoita vastauksesi..."
+        : "Write your reply...",
+    cancel: language === "finnish" ? "Peruuta" : "Cancel",
+    sortByDate: language === "finnish" ? "Päivämäärä" : "Date",
+    sortAsc: language === "finnish" ? "Vanhimmasta uusimpaan" : "Oldest first",
+    sortDesc: language === "finnish" ? "Uusimmasta vanhimpaan" : "Newest first",
+    upvote: language === "finnish" ? "Äänestä ylös" : "Upvote",
+    downvote: language === "finnish" ? "Äänestä alas" : "Downvote",
   };
 
   return (
@@ -295,7 +693,20 @@ export default function WiccerPage() {
         </section>
 
         <section className={styles.timeline}>
-          <h2>{translations.messages}</h2>
+          <div className={styles.timelineHeader}>
+            <h2>{translations.messages}</h2>
+            <button
+              className={styles.sortButton}
+              onClick={handleSortToggle}
+              title={
+                sortOrder === "asc"
+                  ? translations.sortAsc
+                  : translations.sortDesc
+              }
+            >
+              {translations.sortByDate} {sortOrder === "asc" ? "↑" : "↓"}
+            </button>
+          </div>
           {isLoadingPosts ? (
             <div className={styles.loadingContainer}>
               <LoadingText text={translations.loading} />
@@ -304,27 +715,7 @@ export default function WiccerPage() {
             <p className={styles.noPosts}>{translations.noMessages}</p>
           ) : (
             <div className={styles.posts}>
-              {posts.map((post) => (
-                <div key={post.id} className={styles.post}>
-                  <div className={styles.postHeader}>
-                    <span className={styles.nickname}>{post.nickname}</span>
-                    <span className={styles.date}>
-                      {formatDate(post.created_at)}
-                    </span>
-                  </div>
-                  <div className={styles.postContent}>{post.content}</div>
-                  {isAdmin && (
-                    <div className={styles.adminActions}>
-                      <button
-                        className={styles.deleteButton}
-                        onClick={() => handleDeletePost(post.id)}
-                      >
-                        {translations.delete}
-                      </button>
-                    </div>
-                  )}
-                </div>
-              ))}
+              {sortPosts(posts, sortOrder).map((post) => renderPost(post))}
             </div>
           )}
         </section>

@@ -113,6 +113,7 @@
   box-shadow: var(--box-shadow);
   overflow: hidden;
   border: 1px solid var(--border-color);
+  margin-top: 2rem;
 }
 
 .timeline h2 {
@@ -122,6 +123,31 @@
   font-size: 18px;
   color: var(--primary-color);
   font-family: var(--font-cinzel), serif;
+}
+
+.timelineHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.sortButton {
+  background-color: var(--background-input);
+  color: var(--primary-color);
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  padding: 4px 8px;
+  cursor: pointer;
+  font-size: 12px;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.sortButton:hover {
+  background-color: var(--background-hover);
 }
 
 .noPosts {
@@ -139,6 +165,7 @@
   padding: 15px 20px;
   border-bottom: 1px solid var(--border-color);
   transition: background-color 0.2s;
+  position: relative;
 }
 
 .post:hover {
@@ -172,6 +199,112 @@
   word-wrap: break-word;
 }
 
+.postActions {
+  display: flex;
+  gap: 10px;
+  margin-top: 10px;
+  align-items: center;
+}
+
+.voteButtons {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-right: 8px;
+}
+
+.voteButton {
+  background-color: var(--background-input);
+  color: var(--primary-color);
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  padding: 2px 6px;
+  font-size: 12px;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+}
+
+.voteButton:hover {
+  background-color: var(--background-hover);
+}
+
+.voteButtonActive {
+  background-color: var(--primary-color);
+  color: white;
+  border-color: var(--primary-color);
+}
+
+.voteButtonActive:hover {
+  background-color: var(--secondary-color);
+}
+
+.voteButton:disabled {
+  opacity: 0.5;
+}
+
+.voteCount {
+  font-size: 12px;
+  color: var(--text-primary);
+  min-width: 20px;
+  text-align: center;
+}
+
+.replyButton {
+  background-color: var(--background-input);
+  color: var(--primary-color);
+  border: 1px solid var(--primary-color);
+  border-radius: 4px;
+  padding: 4px 8px;
+  font-size: 12px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.replyButton:hover {
+  background-color: var(--background-hover);
+}
+
+.replyForm {
+  margin-top: 15px;
+  padding: 15px;
+  background-color: var(--background-input);
+  border-radius: 5px;
+  border: 1px solid var(--border-color);
+}
+
+.replyActions {
+  display: flex;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.cancelButton {
+  background-color: var(--background-input);
+  color: var(--text-primary);
+  border: 1px solid var(--border-color);
+  border-radius: 30px;
+  padding: 10px 20px;
+  font-size: 16px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.cancelButton:hover {
+  background-color: var(--background-hover);
+}
+
+.replies {
+  margin-top: 10px;
+  border-left: 2px solid var(--border-color);
+  margin-left: 20px;
+}
+
 /* Responsive adjustments */
 @media (max-width: 600px) {
   .container {
@@ -181,6 +314,10 @@
   .postForm,
   .timeline {
     border-radius: 0;
+  }
+
+  .replies {
+    margin-left: 10px;
   }
 }
 
