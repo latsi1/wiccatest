@@ -1,22 +1,19 @@
 "use client";
-import { useState, useRef, useEffect } from "react";
+import { useState, useEffect, useCallback, useMemo } from "react";
 import Image from "next/image";
 
 const OutOfTunePiano = () => {
   const [audioContext, setAudioContext] = useState<AudioContext | null>(null);
   const [imageVisible, setImageVisible] = useState(false); // Track visibility of the image
 
-  // Keys corresponding to piano buttons
-  const keyMap = ["a", "s", "d", "f", "g", "h", "j"];
+  // Keys corresponding to piano buttons - wrapped in useMemo to prevent recreating on every render
+  const keyMap = useMemo(() => ["a", "s", "d", "f", "g", "h", "j"], []);
 
-  const playRandomNoteOrChord = () => {
+  // Wrapped in useCallback to prevent recreating on every render
+  const playRandomNoteOrChord = useCallback(() => {
     const context = audioContext || new AudioContext();
     if (!audioContext) setAudioContext(context);
 
-    // Generate a random frequency (out of tune)
-    const baseFrequencies = [
-      261.63, 293.66, 329.63, 349.23, 392.0, 440.0, 493.88,
-    ]; // C4 to B4
     const chordFrequencies = [
       // Out-of-tune chords (two notes at once)
       [261.63, 329.63], // C4 and E4
@@ -54,7 +51,7 @@ const OutOfTunePiano = () => {
     setTimeout(() => {
       setImageVisible(false);
     }, 1000); // Image will disappear after 1 second
-  };
+  }, [audioContext]); // Only recreate when audioContext changes
 
   // Handle keyboard events
   useEffect(() => {
@@ -78,7 +75,7 @@ const OutOfTunePiano = () => {
     return () => {
       window.removeEventListener("keydown", handleKeyDown);
     };
-  }, [audioContext]); // Re-create the event listener when audioContext changes
+  }, [keyMap, playRandomNoteOrChord]); // Dependencies are now stable
 
   return (
     <div className="relative flex flex-col items-center justify-center min-h-screen bg-black text-white p-6">
@@ -97,8 +94,6 @@ const OutOfTunePiano = () => {
             alt="Sliding Effect"
             width={600}
             height={400}
-            layout="responsive"
-            priority
             style={{
               objectFit: "contain",
             }}
