@@ -4,139 +4,129 @@ import Image from "next/image";
 
 const OutOfTunePiano = () => {
   const [audioContext, setAudioContext] = useState<AudioContext | null>(null);
-  const [imageVisible, setImageVisible] = useState(false); // Track visibility of the image
+  const [imageVisible, setImageVisible] = useState(false);
+  const [isAudioUnlocked, setIsAudioUnlocked] = useState(false);
 
-  // Keys corresponding to piano buttons - wrapped in useMemo to prevent recreating on every render
   const keyMap = useMemo(() => ["a", "s", "d", "f", "g", "h", "j"], []);
 
-  // Wrapped in useCallback to prevent recreating on every render
+  const unlockAudioContext = useCallback(() => {
+    if (!audioContext) {
+      const context = new AudioContext();
+      setAudioContext(context);
+      // Create a silent oscillator to unlock audio on iOS
+      const oscillator = context.createOscillator();
+      const gainNode = context.createGain();
+      oscillator.connect(gainNode);
+      gainNode.connect(context.destination);
+      gainNode.gain.setValueAtTime(0, context.currentTime);
+      oscillator.start();
+      oscillator.stop(context.currentTime + 0.001);
+
+      context.resume().then(() => {
+        setIsAudioUnlocked(true);
+      });
+    }
+  }, [audioContext]);
+
   const playRandomNoteOrChord = useCallback(() => {
-    // Ensure AudioContext is initialized
-    const context = audioContext || new AudioContext();
-    if (!audioContext) setAudioContext(context);
+    if (!audioContext || !isAudioUnlocked) {
+      unlockAudioContext();
+      return;
+    }
+
+    if (audioContext.state === "suspended") {
+      audioContext.resume();
+    }
 
     const chordFrequencies = [
-      // Out-of-tune chords (two notes at once)
-      [261.63, 329.63], // C4 and E4
-      [349.23, 440.0], // F4 and A4
-      [392.0, 493.88], // G4 and B4
-      // Three notes out of tune
-      [261.63, 329.63, 392.0], // C4, E4, G4
-      [440.0, 493.88, 261.63], // A4, B4, C4
+      [261.63, 329.63],
+      [349.23, 440.0],
+      [392.0, 493.88],
+      [261.63, 329.63, 392.0],
+      [440.0, 493.88, 261.63],
     ];
 
     const randomChord =
       chordFrequencies[Math.floor(Math.random() * chordFrequencies.length)];
 
-    // Play the chord
     randomChord.forEach((frequency) => {
-      const oscillator = context.createOscillator();
-      const gainNode = context.createGain();
-      const detuneAmount = (Math.random() - 0.5) * 50; // Randomly detune by ±50 cents
-      oscillator.frequency.value = frequency + detuneAmount;
+      const oscillator = audioContext.createOscillator();
+      const gainNode = audioContext.createGain();
+      const detuneAmount = (Math.random() - 0.5) * 100;
+      oscillator.frequency.value = frequency;
+      oscillator.detune.value = detuneAmount;
       oscillator.type = "sine";
+
       oscillator.connect(gainNode);
-      gainNode.connect(context.destination);
-      gainNode.gain.setValueAtTime(0.5, context.currentTime);
+      gainNode.connect(audioContext.destination);
+
+      gainNode.gain.setValueAtTime(0.5, audioContext.currentTime);
       gainNode.gain.exponentialRampToValueAtTime(
-        0.01,
-        context.currentTime + 0.5
+        0.001,
+        audioContext.currentTime + 0.7
       );
+
       oscillator.start();
-      oscillator.stop(context.currentTime + 0.5);
+      oscillator.stop(audioContext.currentTime + 0.7);
     });
 
-    // Trigger the image visibility and fade away after 1 second
     setImageVisible(true);
-    // After 1 second, hide the image
-    setTimeout(() => {
-      setImageVisible(false);
-    }, 1000); // Image will disappear after 1 second
-  }, [audioContext]); // Only recreate when audioContext changes
+    setTimeout(() => setImageVisible(false), 1000);
+  }, [audioContext, isAudioUnlocked, unlockAudioContext]);
 
-  // Handle keyboard events
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       const key = e.key.toLowerCase();
-      const index = keyMap.indexOf(key);
-      if (index !== -1) {
+      if (keyMap.includes(key) && !e.repeat) {
+        const index = keyMap.indexOf(key);
         playRandomNoteOrChord();
-        // Add visual feedback for the pressed key
+
         const button = document.getElementById(`piano-key-${index}`);
         if (button) {
-          button.classList.add("bg-gray-300");
-          setTimeout(() => {
-            button.classList.remove("bg-gray-300");
-          }, 200);
+          button.classList.add("pressed");
+          setTimeout(() => button.classList.remove("pressed"), 200);
         }
       }
     };
 
     window.addEventListener("keydown", handleKeyDown);
-    return () => {
-      window.removeEventListener("keydown", handleKeyDown);
-    };
-  }, [keyMap, playRandomNoteOrChord]); // Dependencies are now stable
-
-  // Handle AudioContext initialization on user interaction (important for mobile devices)
-  const initializeAudioContext = useCallback(() => {
-    // Only initialize the AudioContext if not already initialized
-    if (!audioContext) {
-      const context = new AudioContext();
-      setAudioContext(context);
-    }
-  }, [audioContext]);
-
-  useEffect(() => {
-    // Initialize AudioContext on user interaction to comply with mobile browser restrictions
-    window.addEventListener("click", initializeAudioContext);
-    window.addEventListener("touchstart", initializeAudioContext);
-
-    return () => {
-      window.removeEventListener("click", initializeAudioContext);
-      window.removeEventListener("touchstart", initializeAudioContext);
-    };
-  }, [initializeAudioContext]);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [keyMap, playRandomNoteOrChord]);
 
   return (
     <div className="relative flex flex-col items-center justify-center min-h-screen bg-black text-white p-6">
-      {/* Image with fixed size */}
       <div
-        className="fixed top-0 left-0 right-0 flex justify-center z-10"
-        style={{
-          opacity: imageVisible ? 1 : 0,
-          transition: "opacity 0.3s ease-in-out",
-          pointerEvents: "none", // Prevents the image from intercepting clicks
-        }}
+        className={`fixed top-0 left-0 right-0 flex justify-center z-10 transition-opacity duration-300 ${
+          imageVisible ? "opacity-100" : "opacity-0"
+        }`}
+        style={{ pointerEvents: "none" }}
       >
-        <div className="w-[600px] h-[400px]">
+        <div className="w-[600px] h-[400px] relative">
           <Image
-            src="/kaluhiis.png" // Change this to the actual image in your /public folder
+            src="/kaluhiis.png"
             alt="Sliding Effect"
-            width={600}
-            height={400}
-            style={{
-              objectFit: "contain",
-            }}
+            fill
+            style={{ objectFit: "contain" }}
+            priority
           />
         </div>
       </div>
 
-      {/* Fixed content that won't move */}
-      <div className="flex flex-col items-center">
+      <div className="flex flex-col items-center z-20">
         <h1 className="text-4xl font-bold mb-12 mt-6">🎹 HiisiPiano</h1>
 
-        <br></br>
-        <br></br>
         <div className="grid grid-cols-7 gap-2">
-          {[...Array(7)].map((_, index) => (
+          {keyMap.map((key, index) => (
             <button
               id={`piano-key-${index}`}
               key={index}
-              onClick={playRandomNoteOrChord}
-              className="w-16 h-24 bg-white border border-black rounded-md shadow-md active:bg-gray-300"
+              onClick={() => {
+                if (!isAudioUnlocked) unlockAudioContext();
+                playRandomNoteOrChord();
+              }}
+              className="w-16 h-24 bg-white text-black border border-black rounded-md shadow-md hover:bg-gray-200 active:bg-gray-300 transition-colors duration-100"
             >
-              <span className="text-black">🎵 {keyMap[index]}</span>
+              <span>🎵 {key.toUpperCase()}</span>
             </button>
           ))}
         </div>
