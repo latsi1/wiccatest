@@ -11,6 +11,7 @@ const OutOfTunePiano = () => {
 
   // Wrapped in useCallback to prevent recreating on every render
   const playRandomNoteOrChord = useCallback(() => {
+    // Ensure AudioContext is initialized
     const context = audioContext || new AudioContext();
     if (!audioContext) setAudioContext(context);
 
@@ -76,6 +77,26 @@ const OutOfTunePiano = () => {
       window.removeEventListener("keydown", handleKeyDown);
     };
   }, [keyMap, playRandomNoteOrChord]); // Dependencies are now stable
+
+  // Handle AudioContext initialization on user interaction (important for mobile devices)
+  const initializeAudioContext = useCallback(() => {
+    // Only initialize the AudioContext if not already initialized
+    if (!audioContext) {
+      const context = new AudioContext();
+      setAudioContext(context);
+    }
+  }, [audioContext]);
+
+  useEffect(() => {
+    // Initialize AudioContext on user interaction to comply with mobile browser restrictions
+    window.addEventListener("click", initializeAudioContext);
+    window.addEventListener("touchstart", initializeAudioContext);
+
+    return () => {
+      window.removeEventListener("click", initializeAudioContext);
+      window.removeEventListener("touchstart", initializeAudioContext);
+    };
+  }, [initializeAudioContext]);
 
   return (
     <div className="relative flex flex-col items-center justify-center min-h-screen bg-black text-white p-6">
