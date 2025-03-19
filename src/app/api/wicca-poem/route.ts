@@ -28,24 +28,18 @@ export async function POST(request: Request) {
     }
 
     // Create prompt with required words and sentence limit
-    const prompt = `Tehtäväsi on luoda lyhyt mystinen Wicca-loitsu SUOMEKSI. Loitsun tulee olla VAIN suomen kielellä, ei englantia.
+    const prompt = `Create a short 7 sentences long Wicca poem.
+The poem MUST include these words:
 
-Loitsu on seuraavalle toiveelle: "${desire}"
-
-TÄRKEÄT VAATIMUKSET:
-1. Loitsun tulee olla MAKSIMISSAAN 5 lausetta pitkä.
-2. Loitsun TÄYTYY sisältää nämä sanat:
-- syyhysääri
-- länkisääri
-- taikurin pöytä
-- mc presidentti
-- frozen teltta
-- turengin velju
-
-Loitsun tulisi olla runollinen ja mystinen. Sisällytä loitsuun viittauksia luontoon, elementteihin tai kuun vaiheisiin.
-
-Vastaa VAIN suomenkielisellä loitsulla, älä anna selityksiä tai johdantoa.`;
-
+syyhysääri
+länkisääri
+taikurin pöytä
+mc presidentti
+frozen teltta
+turengin velju
+"${desire}"
+Translate the poem into Finnish, and then give me only the poem no english version nothing else in respond.`;
+    console.log("DESIRE: " + desire);
     try {
       console.log("Using Hugging Face Inference API with Finnish prompt");
 
