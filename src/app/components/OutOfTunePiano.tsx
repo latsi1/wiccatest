@@ -1,41 +1,16 @@
 "use client";
-import { useState, useEffect, useCallback, useMemo } from "react";
+import { useState, useEffect, useMemo } from "react";
 import Image from "next/image";
 
 const OutOfTunePiano = () => {
   const [audioContext, setAudioContext] = useState<AudioContext | null>(null);
   const [imageVisible, setImageVisible] = useState(false);
-  const [isAudioUnlocked, setIsAudioUnlocked] = useState(false);
 
   const keyMap = useMemo(() => ["a", "s", "d", "f", "g", "h", "j"], []);
 
-  const unlockAudioContext = useCallback(() => {
-    if (!audioContext) {
-      const context = new AudioContext();
-      setAudioContext(context);
-      // Create a silent oscillator to unlock audio on iOS
-      const oscillator = context.createOscillator();
-      const gainNode = context.createGain();
-      oscillator.connect(gainNode);
-      gainNode.connect(context.destination);
-      gainNode.gain.setValueAtTime(0, context.currentTime);
-      oscillator.start();
-      oscillator.stop(context.currentTime + 0.001);
-
-      context.resume().then(() => {
-        setIsAudioUnlocked(true);
-      });
-    }
-  }, [audioContext]);
-
-  const playRandomNoteOrChord = useCallback(() => {
-    if (!audioContext || !isAudioUnlocked) {
-      unlockAudioContext();
-      return;
-    }
-
-    if (audioContext.state === "suspended") {
-      audioContext.resume();
+  const playRandomNoteOrChord = (context: AudioContext) => {
+    if (context.state === "suspended") {
+      context.resume();
     }
 
     const chordFrequencies = [
@@ -50,37 +25,48 @@ const OutOfTunePiano = () => {
       chordFrequencies[Math.floor(Math.random() * chordFrequencies.length)];
 
     randomChord.forEach((frequency) => {
-      const oscillator = audioContext.createOscillator();
-      const gainNode = audioContext.createGain();
+      const oscillator = context.createOscillator();
+      const gainNode = context.createGain();
       const detuneAmount = (Math.random() - 0.5) * 100;
       oscillator.frequency.value = frequency;
       oscillator.detune.value = detuneAmount;
       oscillator.type = "sine";
 
       oscillator.connect(gainNode);
-      gainNode.connect(audioContext.destination);
+      gainNode.connect(context.destination);
 
-      gainNode.gain.setValueAtTime(0.5, audioContext.currentTime);
+      gainNode.gain.setValueAtTime(0.5, context.currentTime);
       gainNode.gain.exponentialRampToValueAtTime(
         0.001,
-        audioContext.currentTime + 0.7
+        context.currentTime + 0.7
       );
 
       oscillator.start();
-      oscillator.stop(audioContext.currentTime + 0.7);
+      oscillator.stop(context.currentTime + 0.7);
     });
 
     setImageVisible(true);
     setTimeout(() => setImageVisible(false), 1000);
-  }, [audioContext, isAudioUnlocked, unlockAudioContext]);
+  };
+
+  const handlePlay = () => {
+    // Create or use existing AudioContext directly in the click handler
+    let context = audioContext;
+    if (!context) {
+      context = new AudioContext();
+      setAudioContext(context);
+    }
+    playRandomNoteOrChord(context);
+  };
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       const key = e.key.toLowerCase();
       if (keyMap.includes(key) && !e.repeat) {
         const index = keyMap.indexOf(key);
-        playRandomNoteOrChord();
-
+        if (audioContext) {
+          playRandomNoteOrChord(audioContext);
+        }
         const button = document.getElementById(`piano-key-${index}`);
         if (button) {
           button.classList.add("pressed");
@@ -91,7 +77,7 @@ const OutOfTunePiano = () => {
 
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [keyMap, playRandomNoteOrChord]);
+  }, [keyMap, audioContext]);
 
   return (
     <div className="relative flex flex-col items-center justify-center min-h-screen bg-black text-white p-6">
@@ -120,10 +106,7 @@ const OutOfTunePiano = () => {
             <button
               id={`piano-key-${index}`}
               key={index}
-              onClick={() => {
-                if (!isAudioUnlocked) unlockAudioContext();
-                playRandomNoteOrChord();
-              }}
+              onClick={handlePlay}
               className="w-16 h-24 bg-white text-black border border-black rounded-md shadow-md hover:bg-gray-200 active:bg-gray-300 transition-colors duration-100"
             >
               <span>🎵 {key.toUpperCase()}</span>
