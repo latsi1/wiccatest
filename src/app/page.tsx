@@ -79,6 +79,12 @@ export default function Home() {
 
   return (
     <main className={styles.main}>
+      <div className={styles.hero}>
+        <h1 className={styles.heroTitle}>KALPA ON UUSI SUOMEN MESTARI</h1>
+        <div className={styles.heroImage}>
+          <img src="/wiccaset.jpg" alt="Wicca Set" />
+        </div>
+      </div>
       <div className={styles.content}>
         <TypewriterText text={content[language]} />
       </div>

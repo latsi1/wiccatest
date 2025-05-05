@@ -7,6 +7,42 @@
   position: relative;
 }
 
+.hero {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 3rem;
+  text-align: center;
+}
+
+.heroTitle {
+  font-size: 2.5rem;
+  margin-bottom: 2rem;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  text-shadow: 0 0 10px rgba(0, 255, 0, 0.5);
+}
+
+.heroImage {
+  max-width: 800px;
+  width: 100%;
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 0 20px rgba(0, 255, 0, 0.3);
+}
+
+.heroImage img {
+  width: 100%;
+  height: auto;
+  display: block;
+  transition: transform 0.3s ease;
+}
+
+.heroImage img:hover {
+  transform: scale(1.02);
+}
+
 .content {
   max-width: 800px;
   margin: 0 auto;
