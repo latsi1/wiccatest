@@ -79,12 +79,17 @@ export default function LaZZeGeneratorPage() {
   const [etunimi, setEtunimi] = useState("");
   const [sukunimi, setSukunimi] = useState("");
   const [zName, setZName] = useState<string | null>(null);
+  const [counter, setCounter] = useState(420);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (etunimi && sukunimi) {
       setZName(generateZName(etunimi, sukunimi));
     }
+  };
+
+  const handleThumb = () => {
+    setCounter((c) => c + 1);
   };
 
   return (
@@ -171,11 +176,87 @@ export default function LaZZeGeneratorPage() {
               padding: 16,
               borderRadius: 8,
               boxShadow: "0 0 10px #0ff",
+              marginBottom: 32,
             }}
           >
             <span style={{ fontWeight: "bold" }}>{zName}</span>
           </div>
         )}
+        <div style={{ margin: "32px 0 0 0", textAlign: "center" }}>
+          <div
+            style={{
+              color: "#fff",
+              fontSize: "1.1rem",
+              marginBottom: 12,
+              fontWeight: 500,
+            }}
+          >
+            if you like this generator hit thumbs up!
+          </div>
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              gap: 24,
+            }}
+          >
+            <button
+              aria-label="Thumbs up"
+              onClick={handleThumb}
+              style={{
+                background: "#222",
+                border: "none",
+                borderRadius: "50%",
+                width: 48,
+                height: 48,
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                fontSize: 28,
+                color: "#00ff00",
+                cursor: "pointer",
+                boxShadow: "0 2px 8px rgba(0,255,0,0.10)",
+                transition: "background 0.2s",
+              }}
+            >
+              👍
+            </button>
+            <span
+              style={{
+                fontSize: 24,
+                color: "#ff0",
+                fontWeight: 700,
+                minWidth: 40,
+                display: "inline-block",
+                textAlign: "center",
+              }}
+            >
+              {counter}
+            </span>
+            <button
+              aria-label="Thumbs down"
+              onClick={handleThumb}
+              style={{
+                background: "#222",
+                border: "none",
+                borderRadius: "50%",
+                width: 48,
+                height: 48,
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                fontSize: 28,
+                color: "#ff4444",
+                cursor: "pointer",
+                boxShadow: "0 2px 8px rgba(255,0,0,0.10)",
+                transition: "background 0.2s",
+              }}
+            >
+              👎
+            </button>
+          </div>
+        </div>
       </div>
     </main>
   );
