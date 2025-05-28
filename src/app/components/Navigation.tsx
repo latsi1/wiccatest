@@ -74,6 +74,14 @@ export default function Navigation() {
             {translations.soundboard}
           </Link>
         </li>
+        <li>
+          <Link
+            href="/lazzegenerator"
+            className={pathname === "/lazzegenerator" ? styles.active : ""}
+          >
+            {language === "finnish" ? "LaZZeGeneraattori" : "LaZZeGenerator"}
+          </Link>
+        </li>
       </ul>
     </nav>
   );
