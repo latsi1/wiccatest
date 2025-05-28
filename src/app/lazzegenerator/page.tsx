@@ -62,7 +62,7 @@ function sukunimiFeikki(sukunimi: string): string {
 }
 
 function generateZName(etunimi: string, sukunimi: string): string {
-  let z1 = getRandom(Z_PARTS);
+  const z1 = getRandom(Z_PARTS);
   let z2 = getRandom(Z_PARTS);
   while (z2 === z1) {
     z2 = getRandom(Z_PARTS);
