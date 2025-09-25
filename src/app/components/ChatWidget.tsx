@@ -202,7 +202,7 @@ export default function ChatWidget() {
   const pick = (arr: readonly string[]) =>
     arr[Math.floor(Math.random() * arr.length)];
 
-  function generateLocalAnswer(question: string): string {
+  function generateLocalAnswer(_question: string): string {
     const line1 = `${pick(corpus.sky)} ${pick(corpus.verbs)} ${pick(
       corpus.mystic
     )}.`;
@@ -223,8 +223,14 @@ export default function ChatWidget() {
   function startRinging(durationMs: number = 2500) {
     try {
       if (!audioCtxRef.current) {
-        audioCtxRef.current = new (window.AudioContext ||
-          (window as any).webkitAudioContext)();
+        interface WindowWithWebkitAudio extends Window {
+          webkitAudioContext?: typeof AudioContext;
+        }
+        const maybeWindow = window as WindowWithWebkitAudio;
+        const Ctor = window.AudioContext || maybeWindow.webkitAudioContext;
+        if (Ctor) {
+          audioCtxRef.current = new Ctor();
+        }
       }
       const ctx = audioCtxRef.current;
       const gain = ctx.createGain();
@@ -344,7 +350,7 @@ export default function ChatWidget() {
         ]);
         setLoading(false);
       }, delay);
-    } catch (err) {
+    } catch {
       const local = maybePasi(generateLocalAnswer(text));
       const delay = 600 + Math.floor(Math.random() * 1200);
       setTimeout(() => {
@@ -388,7 +394,7 @@ export default function ChatWidget() {
           <div className={styles.messages} ref={listRef}>
             {messages.length === 0 && (
               <div className={styles.hint}>
-                Kysy Wicca-aiheisia kysymyksiä. Esim: "Mitä on esbat?"
+                Kysy Wicca-aiheisia kysymyksiä. Esim: &quot;Mitä on esbat?&quot;
               </div>
             )}
             {messages.map((m, idx) => (

@@ -70,25 +70,35 @@ export async function POST(req: NextRequest) {
         continue;
       }
 
-      let data: any = {};
+      let data: unknown = {};
       try {
-        data = JSON.parse(raw);
+        data = JSON.parse(raw) as unknown;
       } catch {
         errors.push(`${model}: invalid JSON response`);
         continue;
       }
 
       let answer = "";
-      if (Array.isArray(data) && data.length > 0 && data[0].generated_text) {
-        answer = String(data[0].generated_text).trim();
-      } else if (typeof data === "object" && data?.generated_text) {
-        answer = String(data.generated_text).trim();
+      if (
+        Array.isArray(data) &&
+        data.length > 0 &&
+        typeof (data as any)[0] === "object" &&
+        (data as any)[0]?.generated_text
+      ) {
+        answer = String((data as any)[0].generated_text).trim();
+      } else if (
+        data !== null &&
+        typeof data === "object" &&
+        (data as Record<string, unknown>).generated_text
+      ) {
+        answer = String((data as Record<string, unknown>).generated_text).trim();
       } else if (
         Array.isArray(data) &&
         data.length > 0 &&
-        data[0].summary_text
+        typeof (data as any)[0] === "object" &&
+        (data as any)[0].summary_text
       ) {
-        answer = String(data[0].summary_text).trim();
+        answer = String((data as any)[0].summary_text).trim();
       }
 
       if (!answer) {
@@ -104,7 +114,7 @@ export async function POST(req: NextRequest) {
       { error: `HF request failed. Tried: ${errors.join(" | ")}` },
       { status: 500 }
     );
-  } catch (err) {
+  } catch {
     return NextResponse.json({ error: "Unexpected error" }, { status: 500 });
   }
 }
