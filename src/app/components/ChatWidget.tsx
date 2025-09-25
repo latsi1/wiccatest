@@ -202,7 +202,7 @@ export default function ChatWidget() {
   const pick = (arr: readonly string[]) =>
     arr[Math.floor(Math.random() * arr.length)];
 
-  function generateLocalAnswer(_question: string): string {
+  function generateLocalAnswer(): string {
     const line1 = `${pick(corpus.sky)} ${pick(corpus.verbs)} ${pick(
       corpus.mystic
     )}.`;
@@ -327,7 +327,7 @@ export default function ChatWidget() {
       });
       const data = await res.json().catch(() => ({}));
       if (!res.ok || data?.error) {
-        const local = maybePasi(generateLocalAnswer(text));
+        const local = maybePasi(generateLocalAnswer());
         const delay = 600 + Math.floor(Math.random() * 1200);
         setTimeout(() => {
           setMessages((prev) => [
@@ -351,7 +351,7 @@ export default function ChatWidget() {
         setLoading(false);
       }, delay);
     } catch {
-      const local = maybePasi(generateLocalAnswer(text));
+      const local = maybePasi(generateLocalAnswer());
       const delay = 600 + Math.floor(Math.random() * 1200);
       setTimeout(() => {
         setMessages((prev) => [...prev, { role: "assistant", content: local }]);

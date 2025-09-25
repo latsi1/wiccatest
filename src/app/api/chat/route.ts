@@ -78,27 +78,26 @@ export async function POST(req: NextRequest) {
         continue;
       }
 
+      type HfTextObject = { generated_text?: unknown; summary_text?: unknown };
+      type HfTextArray = HfTextObject[];
+
+      const isObject = (val: unknown): val is Record<string, unknown> =>
+        typeof val === "object" && val !== null;
+
       let answer = "";
-      if (
-        Array.isArray(data) &&
-        data.length > 0 &&
-        typeof (data as any)[0] === "object" &&
-        (data as any)[0]?.generated_text
-      ) {
-        answer = String((data as any)[0].generated_text).trim();
-      } else if (
-        data !== null &&
-        typeof data === "object" &&
-        (data as Record<string, unknown>).generated_text
-      ) {
-        answer = String((data as Record<string, unknown>).generated_text).trim();
-      } else if (
-        Array.isArray(data) &&
-        data.length > 0 &&
-        typeof (data as any)[0] === "object" &&
-        (data as any)[0].summary_text
-      ) {
-        answer = String((data as any)[0].summary_text).trim();
+      if (Array.isArray(data)) {
+        const arr = data as HfTextArray;
+        const first = arr[0];
+        if (isObject(first) && typeof first.generated_text === "string") {
+          answer = first.generated_text.trim();
+        } else if (isObject(first) && typeof first.summary_text === "string") {
+          answer = first.summary_text.trim();
+        }
+      } else if (isObject(data)) {
+        const obj = data as HfTextObject;
+        if (typeof obj.generated_text === "string") {
+          answer = obj.generated_text.trim();
+        }
       }
 
       if (!answer) {
