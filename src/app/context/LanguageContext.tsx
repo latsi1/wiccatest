@@ -22,7 +22,7 @@ const LanguageContext = createContext<LanguageContextType | undefined>(
 export function LanguageProvider({ children }: { children: ReactNode }) {
   const [language, setLanguage] = useState<Language>("finnish");
 
-  // Load language preference from localStorage on client side
+  // Load language preference from localStorage on client sides
   useEffect(() => {
     const savedLanguage = localStorage.getItem("language") as Language;
     if (savedLanguage) {
