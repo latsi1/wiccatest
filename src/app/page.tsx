@@ -76,13 +76,67 @@ const content = {
 
 export default function Home() {
   const { language } = useLanguage();
+  const advicesFi = [
+    "Sido kolme varjoa yhteen sukkahousulla ja kuiskaa niille numerot takaperin.",
+    "Aseta keitetty makaroni kompassin päälle ja odota, että se valitsee suuntansa.",
+    "Silitä peiliä vasemmalla jalalla täydenkuun aikaan ja sano “perunapiirakka”.",
+    "Kaada maitoa ovenkahvaan, jotta Ilman henget osaavat tulla ulos sisäänkäynnistä.",
+    "Hautaa rikkoutunut kuulakärkikynä lumihankeen – se parantaa sähköpostit.",
+    "Laita kivi mikroaaltouuniin (älä käynnistä sitä) ja kutsu sitä Alttariksi.",
+    "Kävele kolme kertaa jääkaapin ympäri ennen kuin avaat sen. Energia virtaa paremmin.",
+    "Ripusta sukkasi puuhun ja katso, mikä eläin tulee ensimmäisenä. Se on uusi horoskooppisi.",
+    "Kuiskaa salasana Wi-Fi-reitittimelle – se toimii voimakkaampana loitsuna kuin suola.",
+    "Aseta viisi pullonkorkkia lattialle pentagrammiksi ja tanssi niiden päällä.",
+    "Jos hiuksesi menevät silmille, se on merkki jumalattaren viestistä. Älä siirrä niitä.",
+    "Tee rituaali hampaidenpesussa: lausu mantraksi “minttu on ikuinen”.",
+    "Kiinnitä teelusikka otsaan ja kuvittele, että kuulet universumin reseptit.",
+    "Avaa ikkuna ja huuda “makaroonilaatikko” – näin karkotat negatiivisen energian.",
+    "Piirrä ympyrä lattiaan jauhoilla ja kutsu sitä Sielujen Pizzaksi.",
+    "Katso taskulamppua pimeässä ja ajattele, että se on Aurinko, joka eksyi.",
+    "Jos kengännauhat menevät solmuun, se on henkioppaiden Morse-koodi.",
+    "Kaada vettä vasempaan sukkaan ja ripusta se kuivumaan – se suojelee unissa.",
+    "Sytytä kynttilä ja sammuta se heti – näin teet näkymättömän liekin.",
+    "Pidä kiviä jääkaapissa, ne säteilevät kylmää magiaa.",
+    "Jos leipä putoaa voipuoli alaspäin, se on merkki siitä, että jumalat ovat nälkäisiä.",
+    "Avaa kirja satunnaisesta sivusta ja lue vain kolmas sana. Se on päivän profetia.",
+    "Tee lumiukko ilman päätä ja odota, että se kertoo sinulle salaisuuden.",
+    "Piirrä banaaniin silmät ja kuuntele sen viisaus ennen syömistä.",
+    "Heitä pöytäliina pään päälle ja kuvittele olevasi henki. Näin saat kontaktin.",
+    "Kirjoita muistilappuun “sammakko” ja polta se. Se tuo rahaa tai ainakin savua.",
+    "Laita vasen sukka oikeaan jalkaan ja kävele taaksepäin, niin aika pysähtyy hetkeksi.",
+    "Koputa jääkaappia kolme kertaa ennen sen avaamista – se on kodin portinvartija.",
+    "Puhalla tuulettimeen ja kuvittele, että se levittää loitsusi maailmalle.",
+    "Kun kuulet mikroaaltouunin “pingin”, sano “niin tapahtukoon”.",
+  ];
+
+  const getDayOfYear = (date: Date) => {
+    const start = new Date(date.getFullYear(), 0, 0);
+    const diff =
+      date.getTime() -
+      start.getTime() +
+      (start.getTimezoneOffset() - date.getTimezoneOffset()) * 60 * 1000;
+    const oneDay = 1000 * 60 * 60 * 24;
+    return Math.floor(diff / oneDay);
+  };
+
+  const dayIndex = getDayOfYear(new Date());
+  const dailyAdviceFi = advicesFi[dayIndex % advicesFi.length];
 
   return (
     <main className={styles.main}>
       <div className={styles.hero}>
-        <h1 className={styles.heroTitle}>KALPA ON UUSI SUOMEN MESTARI</h1>
         <div className={styles.heroImage}>
-          <img src="/wiccaset.jpg" alt="Wicca Set" />
+          <img src="/uhvot.png" alt="Uhvot" />
+        </div>
+      </div>
+      <div className={styles.advice}>
+        <div className={styles.adviceTitle}>
+          {language === "finnish" ? "Päivän Wicca-neuvo" : "Daily Wicca Advice"}
+        </div>
+        <div className={styles.adviceBox}>
+          {language === "finnish"
+            ? dailyAdviceFi
+            : "A daily tip will appear here soon."}
         </div>
       </div>
       <div className={styles.content}>

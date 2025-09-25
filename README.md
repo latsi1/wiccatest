@@ -76,6 +76,27 @@ This application is designed to be deployed on Vercel. Make sure to add the foll
 
 - `DATABASE_URL`: Your Neon PostgreSQL connection string
 
+### Wicca Chat (Hugging Face Inference)
+
+To enable the site-wide Wicca Chat bot:
+
+1. Create a free token at https://huggingface.co/settings/tokens
+2. Add the token locally or in Vercel env vars:
+
+Local (PowerShell):
+
+```
+$env:HF_API_TOKEN="hf_...your_token_here"
+```
+
+Vercel → Project Settings → Environment Variables:
+
+- Key: `HF_API_TOKEN`
+- Value: your token value
+- Environments: Development/Preview/Production
+
+Optional: choose a different model by setting `HF_MODEL` (default: `mistralai/Mistral-7B-Instruct-v0.2`).
+
 ## Database Setup
 
 The application automatically creates the necessary database tables on startup. The Twitter clone feature uses a `posts` table with the following schema:

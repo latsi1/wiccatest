@@ -15,6 +15,7 @@ export default function Navigation() {
     spells: language === "finnish" ? "Loitsut" : "Spells",
     community: language === "finnish" ? "Wiccers" : "Wiccers",
     soundboard: language === "finnish" ? "Soundboard" : "Soundboard",
+    facts: language === "finnish" ? "Wicca Faktat" : "Wicca Facts",
   };
 
   return (
@@ -72,6 +73,14 @@ export default function Navigation() {
             className={pathname === "/soundboard" ? styles.active : ""}
           >
             {translations.soundboard}
+          </Link>
+        </li>
+        <li>
+          <Link
+            href="/wiccafacts"
+            className={pathname === "/wiccafacts" ? styles.active : ""}
+          >
+            {translations.facts}
           </Link>
         </li>
         <li>

@@ -1,0 +1,120 @@
+.container {
+  min-height: 100vh;
+  padding: 2rem;
+  color: var(--text-primary, #eaeaea);
+  background: radial-gradient(
+      1200px 600px at 10% -10%,
+      rgba(0, 255, 200, 0.12),
+      transparent
+    ),
+    radial-gradient(
+      1000px 500px at 90% 10%,
+      rgba(200, 0, 255, 0.1),
+      transparent
+    ),
+    #000;
+}
+
+.header {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.title {
+  font-size: 2.6rem;
+  font-family: "Cinzel", serif;
+  letter-spacing: 1px;
+  text-shadow: 0 0 12px rgba(255, 255, 255, 0.25);
+}
+
+.subtitle {
+  color: var(--text-secondary, #a0a0a0);
+  margin-top: 0.5rem;
+}
+
+.hero {
+  display: flex;
+  justify-content: center;
+  margin: 2rem 0 3rem 0;
+}
+
+.imageFrame {
+  position: relative;
+  max-width: 960px;
+  width: 100%;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 0 24px rgba(0, 255, 160, 0.15), 0 0 48px rgba(140, 0, 255, 0.12);
+}
+
+.image {
+  display: block;
+  width: 100%;
+  height: auto;
+  filter: contrast(1.05) saturate(1.1);
+  transition: transform 0.6s ease, filter 0.6s ease;
+}
+
+.imageFrame:hover .image {
+  transform: scale(1.03);
+  filter: contrast(1.1) saturate(1.2)
+    drop-shadow(0 0 24px rgba(0, 255, 170, 0.15));
+}
+
+.glow {
+  pointer-events: none;
+  position: absolute;
+  inset: -20%;
+  background: radial-gradient(
+      circle at 30% 20%,
+      rgba(0, 255, 170, 0.12),
+      transparent 40%
+    ),
+    radial-gradient(circle at 70% 80%, rgba(160, 0, 255, 0.12), transparent 45%);
+  filter: blur(30px);
+}
+
+.factsSection {
+  max-width: 900px;
+  margin: 0 auto;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 12px;
+  padding: 1.5rem;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+  backdrop-filter: blur(4px);
+}
+
+.factsHeading {
+  font-size: 1.4rem;
+  margin-bottom: 1rem;
+}
+
+.factsList {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0.8rem;
+}
+
+.factItem {
+  background: rgba(0, 0, 0, 0.4);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 10px;
+  padding: 0.9rem 1rem;
+  color: var(--text-primary, #eaeaea);
+  box-shadow: inset 0 0 10px rgba(255, 255, 255, 0.03);
+}
+
+@media (max-width: 768px) {
+  .container {
+    padding: 1rem;
+  }
+
+  .title {
+    font-size: 2rem;
+  }
+}
+

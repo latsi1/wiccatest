@@ -17,11 +17,7 @@
 }
 
 .heroTitle {
-  font-size: 2.5rem;
-  margin-bottom: 2rem;
-  text-transform: uppercase;
-  letter-spacing: 2px;
-  text-shadow: 0 0 10px rgba(0, 255, 0, 0.5);
+  display: none;
 }
 
 .heroImage {
@@ -47,4 +43,27 @@
   max-width: 800px;
   margin: 0 auto;
   padding-top: 2rem;
+}
+
+.advice {
+  max-width: 800px;
+  margin: 0 auto 1.5rem auto;
+}
+
+.adviceTitle {
+  font-size: 1.2rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: #8bffdf;
+  margin-bottom: 0.5rem;
+}
+
+.adviceBox {
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 8px;
+  padding: 0.9rem 1rem;
+  color: #eaeaea;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.35);
 }
