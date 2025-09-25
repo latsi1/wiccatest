@@ -233,6 +233,9 @@ export default function ChatWidget() {
         }
       }
       const ctx = audioCtxRef.current;
+      if (!ctx) {
+        return;
+      }
       const gain = ctx.createGain();
       gain.connect(ctx.destination);
       const makeBeep = (startTime: number, freq: number) => {
