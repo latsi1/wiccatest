@@ -270,7 +270,7 @@ export default function ChatWidget() {
 
   function startCallAudio() {
     if (!callAudioRef.current) {
-      callAudioRef.current = new Audio("/kale.wav");
+      callAudioRef.current = new Audio("/kale.mp4");
     }
     callAudioRef.current.currentTime = 0;
     callAudioRef.current.play().catch(() => {});
