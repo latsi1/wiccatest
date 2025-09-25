@@ -348,7 +348,7 @@ export default function ChatWidget() {
           ...prev,
           {
             role: "assistant",
-            content: maybePasi(answer || generateLocalAnswer(text)),
+            content: maybePasi(answer || generateLocalAnswer()),
           },
         ]);
         setLoading(false);
