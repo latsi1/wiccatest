@@ -16,9 +16,18 @@ export default function ChatWidget() {
   const listRef = useRef<HTMLDivElement | null>(null);
   const [isCalling, setIsCalling] = useState(false);
   const [hasAnswered, setHasAnswered] = useState(false);
+  const [kaleVideoState, setKaleVideoState] = useState<
+    "idle" | "waiting" | "responding" | "answering"
+  >("idle");
+  const [currentVideo, setCurrentVideo] = useState<string>("");
+  const [isKaleResponsePlaying, setIsKaleResponsePlaying] = useState(false);
+  const [currentKaleIndex, setCurrentKaleIndex] = useState(0);
   const callAudioRef = useRef<HTMLAudioElement | null>(null);
   const audioCtxRef = useRef<AudioContext | null>(null);
   const ringIntervalRef = useRef<number | null>(null);
+  const videoRef = useRef<HTMLVideoElement | null>(null);
+  const waitingTimerRef = useRef<number | null>(null);
+  const kaleResponseTimerRef = useRef<number | null>(null);
 
   useEffect(() => {
     if (listRef.current) {
@@ -26,12 +35,152 @@ export default function ChatWidget() {
     }
   }, [messages, isOpen]);
 
+  // Initialize video element when it becomes available
+  useEffect(() => {
+    if (videoRef.current && currentVideo) {
+      console.log("Video element ready, setting source:", currentVideo);
+      videoRef.current.src = `/${currentVideo}`;
+      videoRef.current.volume = 0.8; // Set volume
+      videoRef.current.muted = false; // Ensure not muted
+      videoRef.current.load(); // Force reload
+    }
+  }, [currentVideo, isCalling]);
+
   useEffect(() => {
     return () => {
       stopRinging();
       stopCallAudio();
+      clearWaitingTimer();
+      clearKaleResponseTimer();
     };
   }, []);
+
+  // Video management functions
+  const playKaleVideo = (videoName: string) => {
+    setCurrentVideo(videoName);
+
+    // Check if this is a kale6-19 response video
+    const isKaleResponse =
+      videoName.startsWith("kale") &&
+      videoName.match(/kale(1[0-9]|[6-9])\.mp4$/);
+
+    if (videoRef.current) {
+      videoRef.current.src = `/${videoName}`;
+      videoRef.current.volume = 0.8; // Set volume
+      videoRef.current.muted = false; // Ensure not muted
+      videoRef.current.loop = videoName === "kaleafk.mp4"; // Only loop kaleafk.mp4
+
+      // Add event listener for when video ends (only for kale6-19 and kaletassaufo)
+      if (videoName !== "kaleafk.mp4" && videoName !== "kaletassa.mp4") {
+        const handleVideoEnd = () => {
+          playKaleVideo("kaleafk.mp4");
+          setKaleVideoState("waiting");
+          setIsKaleResponsePlaying(false);
+          videoRef.current?.removeEventListener("ended", handleVideoEnd);
+        };
+        videoRef.current.addEventListener("ended", handleVideoEnd);
+      }
+
+      // Set kale response playing state
+      if (isKaleResponse) {
+        setIsKaleResponsePlaying(true);
+      } else {
+        setIsKaleResponsePlaying(false);
+      }
+
+      videoRef.current.play().catch((error) => {
+        console.log(`Could not play video: ${videoName}`, error);
+      });
+    }
+  };
+
+  const getNextKaleResponse = () => {
+    const kaleResponses = Array.from(
+      { length: 14 },
+      (_, i) => `kale${i + 6}.mp4`
+    );
+    const currentResponse = kaleResponses[currentKaleIndex];
+
+    // Move to next kale video for next time
+    setCurrentKaleIndex((prevIndex) => (prevIndex + 1) % kaleResponses.length);
+
+    console.log(
+      `Playing kale video ${currentKaleIndex + 6}: ${currentResponse}`
+    );
+    return currentResponse;
+  };
+
+  const isGreeting = (text: string) => {
+    const greetings = [
+      "hello",
+      "hey",
+      "hi",
+      "moro",
+      "terve",
+      "hei",
+      "wadaap",
+      "moi",
+      "greetings",
+      "good morning",
+      "good afternoon",
+      "good evening",
+      "morning",
+      "afternoon",
+      "evening",
+      "sup",
+      "yo",
+      "howdy",
+      "salut",
+      "bonjour",
+    ];
+    const lowerText = text.toLowerCase().trim();
+    console.log("Checking greeting for:", lowerText);
+    const isGreetingResult = greetings.some((greeting) =>
+      lowerText.includes(greeting)
+    );
+    console.log("Is greeting:", isGreetingResult);
+    return isGreetingResult;
+  };
+
+  const clearWaitingTimer = () => {
+    if (waitingTimerRef.current) {
+      clearTimeout(waitingTimerRef.current);
+      waitingTimerRef.current = null;
+    }
+  };
+
+  const clearKaleResponseTimer = () => {
+    if (kaleResponseTimerRef.current) {
+      clearTimeout(kaleResponseTimerRef.current);
+      kaleResponseTimerRef.current = null;
+    }
+  };
+
+  const startWaitingForInput = () => {
+    setKaleVideoState("waiting");
+    // Keep playing kaleafk.mp4 as continuous placeholder
+    playKaleVideo("kaleafk.mp4");
+  };
+
+  const startKaleResponse = () => {
+    setKaleVideoState("responding");
+    clearWaitingTimer();
+    const nextResponse = getNextKaleResponse();
+    playKaleVideo(nextResponse);
+    // Video will automatically return to kaleafk.mp4 when it ends
+  };
+
+  const startKaleAnswering = () => {
+    // Don't play kaletassaufo.mp4 if kale6-19 is currently playing
+    if (isKaleResponsePlaying) {
+      console.log("Kale response is playing, skipping kaletassaufo.mp4");
+      return;
+    }
+
+    setKaleVideoState("answering");
+    playKaleVideo("kaletassaufo.mp4");
+    // Video will automatically return to kaleafk.mp4 when it ends
+  };
 
   // Local fallback data and generator
   const corpus = {
@@ -297,30 +446,63 @@ export default function ChatWidget() {
   const startCall = () => {
     if (isCalling) return;
     setIsCalling(true);
-    setHasAnswered(false);
-    startRinging(3000);
-    window.setTimeout(() => {
-      setHasAnswered(true);
-      startCallAudio();
-    }, 3000);
+    setHasAnswered(true); // Immediately show as answered
+    setKaleVideoState("idle");
+    console.log("Starting call, playing kaletassa.mp4");
+    playKaleVideo("kaletassa.mp4"); // Play kaletassa.mp4 when connected
+
+    // After kaletassa.mp4, start the normal waiting loop
+    // Use a longer timeout to ensure kaletassa.mp4 plays completely
+    setTimeout(() => {
+      startWaitingForInput();
+    }, 5000); // Give kaletassa.mp4 time to play completely
   };
 
   const endCall = () => {
     stopRinging();
     stopCallAudio();
+    clearWaitingTimer();
+    clearKaleResponseTimer();
     setIsCalling(false);
     setHasAnswered(false);
+    setKaleVideoState("idle");
+    setCurrentVideo("");
+    setIsKaleResponsePlaying(false);
+    setCurrentKaleIndex(0); // Reset kale video sequence
+    // Stop video when call ends
+    if (videoRef.current) {
+      videoRef.current.pause();
+      videoRef.current.currentTime = 0;
+    }
   };
 
   const sendMessage = async () => {
     const text = input.trim();
     if (!text || loading) return;
+
+    // Add user message to chat
     const nextMessages: ChatMessage[] = [
       ...messages,
       { role: "user", content: text },
     ];
     setMessages(nextMessages);
     setInput("");
+
+    // If in call mode, only show video responses, no text
+    if (isCalling && hasAnswered) {
+      console.log("In call mode, checking greeting for:", text);
+      // Check if it's a greeting
+      if (isGreeting(text)) {
+        console.log("Detected greeting, playing kaletassaufo.mp4");
+        startKaleAnswering(); // Play kaletassaufo.mp4 for greetings
+      } else {
+        console.log("Not a greeting, playing random kale response");
+        startKaleResponse(); // Play random kale6-19 for other messages
+      }
+      return; // Don't send API request or show text responses
+    }
+
+    // Normal text chat mode
     setLoading(true);
     try {
       const res = await fetch("/api/chat", {
@@ -394,8 +576,24 @@ export default function ChatWidget() {
               ×
             </button>
           </div>
+
+          {/* Separate Video Window */}
+          {isCalling && hasAnswered && (
+            <div className={styles.videoWindow}>
+              <video
+                ref={videoRef}
+                className={styles.callVideo}
+                autoPlay
+                loop={currentVideo === "kaleafk.mp4"}
+                playsInline
+              >
+                <source src={`/${currentVideo}`} type="video/mp4" />
+                Your browser does not support the video tag.
+              </video>
+            </div>
+          )}
           <div className={styles.messages} ref={listRef}>
-            {messages.length === 0 && (
+            {messages.length === 0 && !isCalling && (
               <div className={styles.hint}>
                 Kysy Wicca-aiheisia kysymyksiä. Esim: &quot;Mitä on esbat?&quot;
               </div>
@@ -410,7 +608,9 @@ export default function ChatWidget() {
                 {m.content}
               </div>
             ))}
-            {loading && <div className={styles.typing}>Kale is writing...</div>}
+            {loading && !isCalling && (
+              <div className={styles.typing}>Kale is writing...</div>
+            )}
           </div>
           <div className={styles.inputRow}>
             <input
@@ -427,31 +627,6 @@ export default function ChatWidget() {
             >
               Lähetä
             </button>
-          </div>
-        </div>
-      )}
-      {isCalling && (
-        <div className={styles.callOverlay}>
-          <div className={styles.callCard}>
-            <div className={styles.callHeader}>
-              <span className={styles.callName}>Kale</span>
-              <span className={styles.status}>
-                <span className={styles.dot} />{" "}
-                {hasAnswered ? "CONNECTED" : "RINGING"}
-              </span>
-            </div>
-            <div className={styles.callBody}>
-              {hasAnswered ? (
-                <img src="/kheil.png" alt="Kale" className={styles.callImage} />
-              ) : (
-                <div className={styles.ringingText}>Toot… Toot…</div>
-              )}
-            </div>
-            <div className={styles.callActions}>
-              <button className={styles.hang} onClick={endCall}>
-                Lopeta
-              </button>
-            </div>
           </div>
         </div>
       )}

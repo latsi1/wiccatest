@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 import styles from "./page.module.css";
 import { TypewriterText } from "@/app/components/TypewriterText";
 import { useLanguage } from "./context/LanguageContext";
@@ -76,6 +76,12 @@ const content = {
 
 export default function Home() {
   const { language } = useLanguage();
+  const [showConfirmationPopup, setShowConfirmationPopup] = useState(false);
+  const [showPurchasePopup, setShowPurchasePopup] = useState(false);
+  const [userIP, setUserIP] = useState<string>("");
+  const [isPurchasing, setIsPurchasing] = useState(false);
+  const [currentKaleIndex, setCurrentKaleIndex] = useState(0);
+
   const advicesFi = [
     "Sido kolme varjoa yhteen sukkahousulla ja kuiskaa niille numerot takaperin.",
     "Aseta keitetty makaroni kompassin päälle ja odota, että se valitsee suuntansa.",
@@ -122,6 +128,51 @@ export default function Home() {
   const dayIndex = getDayOfYear(new Date());
   const dailyAdviceFi = advicesFi[dayIndex % advicesFi.length];
 
+  const handlePurchaseClick = () => {
+    setShowConfirmationPopup(true);
+  };
+
+  const handleConfirmPurchase = async () => {
+    setShowConfirmationPopup(false);
+    setIsPurchasing(true);
+
+    // Get user IP address
+    try {
+      const response = await fetch("https://api.ipify.org?format=json");
+      const data = await response.json();
+      setUserIP(data.ip);
+    } catch (error) {
+      setUserIP("Unable to detect IP");
+    }
+
+    // Show success popup after a short delay for effect
+    setTimeout(() => {
+      setShowPurchasePopup(true);
+      setIsPurchasing(false);
+
+      // Play kale sound in sequence
+      const kaleSounds = ["kale1.wav", "kale2.wav", "kale3.wav", "kale4.wav"];
+      const currentSound = kaleSounds[currentKaleIndex];
+      const audio = new Audio(`/sounds/${currentSound}`);
+      audio.play().catch(() => {
+        // Fallback if sound fails
+        console.log("Sound could not be played");
+      });
+
+      // Move to next kale sound for next purchase
+      setCurrentKaleIndex((prevIndex) => (prevIndex + 1) % kaleSounds.length);
+    }, 1000);
+  };
+
+  const handleCancelPurchase = () => {
+    setShowConfirmationPopup(false);
+  };
+
+  const handleClosePopup = () => {
+    setShowPurchasePopup(false);
+    setUserIP("");
+  };
+
   return (
     <main className={styles.main}>
       <div className={styles.hero}>
@@ -139,9 +190,110 @@ export default function Home() {
             : "A daily tip will appear here soon."}
         </div>
       </div>
+
+      <div className={styles.purchaseSection}>
+        <div className={styles.purchaseTitle}>
+          {language === "finnish"
+            ? "Henkilökohtainen neuvonta elämään wicca-tyylillä"
+            : "Personal advice for the life wicca style"}
+        </div>
+        <div className={styles.purchaseDescription}>
+          {language === "finnish"
+            ? "Saat henkilökohtaista neuvontaa elämäsi haasteisiin wicca-perinteiden mukaisesti. Sisältää energian käyttöä, visualisointia ja luonnon kuuntelemista."
+            : "Get personalized advice for your life challenges in the wicca tradition. Includes energy work, visualization, and listening to nature."}
+        </div>
+        <div className={styles.priceTag}>€5.00</div>
+        <button
+          className={`${styles.buyButton} ${
+            isPurchasing ? styles.purchasing : ""
+          }`}
+          onClick={handlePurchaseClick}
+          disabled={isPurchasing}
+        >
+          {isPurchasing
+            ? language === "finnish"
+              ? "Ostetaan..."
+              : "Purchasing..."
+            : language === "finnish"
+            ? "Osta nyt"
+            : "Buy Now"}
+        </button>
+      </div>
       <div className={styles.content}>
         <TypewriterText text={content[language]} />
       </div>
+
+      {showConfirmationPopup && (
+        <div className={styles.popupOverlay}>
+          <div className={styles.popup}>
+            <div className={styles.popupHeader}>
+              <h3>
+                {language === "finnish" ? "Vahvista osto" : "Confirm Purchase"}
+              </h3>
+              <button
+                className={styles.closeButton}
+                onClick={handleCancelPurchase}
+              >
+                ×
+              </button>
+            </div>
+            <div className={styles.popupContent}>
+              <div className={styles.confirmationIcon}>🔮</div>
+              <p className={styles.popupMessage}>
+                {language === "finnish"
+                  ? "Haluatko varmasti ostaa henkilökohtaisen wicca-neuvonnan hintaan 5€?"
+                  : "Are you sure you want to purchase personal wicca advice for €5?"}
+              </p>
+              <div className={styles.confirmationButtons}>
+                <button
+                  className={styles.confirmButton}
+                  onClick={handleConfirmPurchase}
+                >
+                  {language === "finnish" ? "Kyllä, osta" : "Yes, buy"}
+                </button>
+                <button
+                  className={styles.cancelButton}
+                  onClick={handleCancelPurchase}
+                >
+                  {language === "finnish" ? "Peruuta" : "Cancel"}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {showPurchasePopup && (
+        <div className={styles.popupOverlay}>
+          <div className={styles.popup}>
+            <div className={styles.popupHeader}>
+              <h3>
+                {language === "finnish"
+                  ? "Osto vahvistettu!"
+                  : "Purchase Confirmed!"}
+              </h3>
+              <button className={styles.closeButton} onClick={handleClosePopup}>
+                ×
+              </button>
+            </div>
+            <div className={styles.popupContent}>
+              <div className={styles.successIcon}>✨</div>
+              <p className={styles.popupMessage}>
+                {language === "finnish"
+                  ? "Kiitos ostoksestasi! Henkilökohtainen wicca-neuvonta lähetetään sinulle sähköpostitse."
+                  : "Thank you for your purchase! Personal wicca advice will be sent to you via email."}
+              </p>
+              <div className={styles.billingInfo}>
+                <p className={styles.ipAddress}>
+                  {language === "finnish"
+                    ? `Laskutamme 5€ IP-osoitteen perusteella: ${userIP}`
+                    : `We will bill 5 euros based on IP address: ${userIP}`}
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </main>
   );
 }
