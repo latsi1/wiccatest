@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
+import Image from "next/image";
 import styles from "./page.module.css";
 import { TypewriterText } from "@/app/components/TypewriterText";
 import { useLanguage } from "./context/LanguageContext";
@@ -141,7 +142,7 @@ export default function Home() {
       const response = await fetch("https://api.ipify.org?format=json");
       const data = await response.json();
       setUserIP(data.ip);
-    } catch (error) {
+    } catch {
       setUserIP("Unable to detect IP");
     }
 
@@ -177,7 +178,7 @@ export default function Home() {
     <main className={styles.main}>
       <div className={styles.hero}>
         <div className={styles.heroImage}>
-          <img src="/uhvot.png" alt="Uhvot" />
+          <Image src="/uhvot.png" alt="Uhvot" width={400} height={300} />
         </div>
       </div>
       <div className={styles.advice}>

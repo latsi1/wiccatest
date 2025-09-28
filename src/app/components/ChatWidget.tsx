@@ -16,7 +16,7 @@ export default function ChatWidget() {
   const listRef = useRef<HTMLDivElement | null>(null);
   const [isCalling, setIsCalling] = useState(false);
   const [hasAnswered, setHasAnswered] = useState(false);
-  const [kaleVideoState, setKaleVideoState] = useState<
+  const [, setKaleVideoState] = useState<
     "idle" | "waiting" | "responding" | "answering"
   >("idle");
   const [currentVideo, setCurrentVideo] = useState<string>("");
@@ -369,6 +369,7 @@ export default function ChatWidget() {
     return Math.random() < 0.1 ? "Helevetin pässi" : text;
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   function startRinging(durationMs: number = 2500) {
     try {
       if (!audioCtxRef.current) {
@@ -426,6 +427,7 @@ export default function ChatWidget() {
     }
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   function startCallAudio() {
     if (!callAudioRef.current) {
       callAudioRef.current = new Audio("/kale.mp4");
