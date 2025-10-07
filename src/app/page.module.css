@@ -7,6 +7,197 @@
   position: relative;
 }
 
+.gameAnnouncement {
+  max-width: 1000px;
+  margin: 0 auto 3rem auto;
+  background: linear-gradient(
+    135deg,
+    rgba(0, 255, 0, 0.1),
+    rgba(139, 255, 223, 0.1)
+  );
+  border: 2px solid rgba(0, 255, 0, 0.3);
+  border-radius: 15px;
+  padding: 2rem;
+  box-shadow: 0 8px 32px rgba(0, 255, 0, 0.2);
+  position: relative;
+  overflow: hidden;
+}
+
+.gameAnnouncement::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(0, 255, 0, 0.1),
+    transparent
+  );
+  animation: shimmer 4s infinite;
+}
+
+@keyframes shimmer {
+  0% {
+    left: -100%;
+  }
+  100% {
+    left: 100%;
+  }
+}
+
+.announcementContent {
+  display: flex;
+  align-items: center;
+  gap: 2rem;
+  position: relative;
+  z-index: 1;
+}
+
+.announcementText {
+  flex: 1;
+}
+
+.announcementTitle {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #8bffdf;
+  margin-bottom: 1rem;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  text-shadow: 0 0 20px rgba(139, 255, 223, 0.5);
+  animation: glow 2s ease-in-out infinite alternate;
+}
+
+@keyframes glow {
+  from {
+    text-shadow: 0 0 20px rgba(139, 255, 223, 0.5);
+  }
+  to {
+    text-shadow: 0 0 30px rgba(139, 255, 223, 0.8),
+      0 0 40px rgba(0, 255, 0, 0.3);
+  }
+}
+
+.announcementDescription {
+  font-size: 1.2rem;
+  color: #eaeaea;
+  line-height: 1.6;
+  margin: 0;
+}
+
+.gameVideoContainer {
+  flex: 1;
+  max-width: 400px;
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 4px 20px rgba(0, 255, 0, 0.3);
+  border: 2px solid rgba(0, 255, 0, 0.2);
+  position: relative;
+}
+
+.gameVideo {
+  width: 100%;
+  height: auto;
+  display: block;
+  transition: transform 0.3s ease;
+}
+
+.gameVideo:hover {
+  transform: scale(1.02);
+}
+
+.playButtonOverlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10;
+  transition: opacity 0.3s ease;
+}
+
+.playButton {
+  background: linear-gradient(45deg, #00ff00, #8bffdf);
+  color: #000;
+  border: none;
+  padding: 1rem 2rem;
+  border-radius: 50px;
+  cursor: pointer;
+  font-size: 1.1rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  box-shadow: 0 4px 20px rgba(0, 255, 0, 0.4);
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  animation: pulse 2s infinite;
+}
+
+.playButton:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 25px rgba(0, 255, 0, 0.6);
+  background: linear-gradient(45deg, #8bffdf, #00ff00);
+}
+
+.playIcon {
+  font-size: 1.2rem;
+}
+
+.playText {
+  font-family: "Courier New", monospace;
+}
+
+@keyframes pulse {
+  0%,
+  100% {
+    transform: scale(1);
+    box-shadow: 0 4px 20px rgba(0, 255, 0, 0.4);
+  }
+  50% {
+    transform: scale(1.05);
+    box-shadow: 0 6px 25px rgba(0, 255, 0, 0.6);
+  }
+}
+
+/* Responsive design for mobile */
+@media (max-width: 768px) {
+  .announcementContent {
+    flex-direction: column;
+    text-align: center;
+    gap: 1.5rem;
+  }
+
+  .announcementTitle {
+    font-size: 1.5rem;
+  }
+
+  .announcementDescription {
+    font-size: 1rem;
+  }
+
+  .gameVideoContainer {
+    max-width: 100%;
+  }
+
+  .playButton {
+    padding: 0.8rem 1.5rem;
+    font-size: 1rem;
+  }
+
+  .playText {
+    display: none;
+  }
+}
+
 .hero {
   display: flex;
   flex-direction: column;

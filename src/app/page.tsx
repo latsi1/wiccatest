@@ -176,6 +176,35 @@ export default function Home() {
 
   return (
     <main className={styles.main}>
+      {/* Game Release Announcement */}
+      <div className={styles.gameAnnouncement}>
+        <div className={styles.announcementContent}>
+          <div className={styles.announcementText}>
+            <h2 className={styles.announcementTitle}>
+              {language === "finnish"
+                ? "🎮 WICCA GAME 2026 - TULOSSA! 🎮"
+                : "🎮 WICCA GAME 2026 - COMING SOON! 🎮"}
+            </h2>
+            <p className={styles.announcementDescription}>
+              {language === "finnish"
+                ? "Kokemus mystiikkaa ja magiaa uudella tavalla. Peli julkaistaan vuonna 2026!"
+                : "Experience mysticism and magic in a new way. Game releases in 2026!"}
+            </p>
+          </div>
+          <div className={styles.gameVideoContainer}>
+            <video
+              className={styles.gameVideo}
+              controls
+              preload="metadata"
+              playsInline
+            >
+              <source src="/wiccagame.mp4" type="video/mp4" />
+              Your browser does not support the video tag.
+            </video>
+          </div>
+        </div>
+      </div>
+
       <div className={styles.hero}>
         <div className={styles.heroImage}>
           <Image src="/uhvot.png" alt="Uhvot" width={400} height={300} />
