@@ -94,7 +94,7 @@ export default function LaZZeGeneratorPage() {
             setCounter(data.count);
           }
         }
-      } catch (e) {
+      } catch {
         // swallow
       }
     };
@@ -123,7 +123,7 @@ export default function LaZZeGeneratorPage() {
           setCounter(data.count);
         }
       }
-    } catch (e) {
+    } catch {
       // ignore
     } finally {
       setIsLiking(false);
