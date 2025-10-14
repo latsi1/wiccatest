@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import styles from "../page.module.css";
 
 function getRandom<T>(arr: T[]): T {
@@ -80,6 +80,26 @@ export default function LaZZeGeneratorPage() {
   const [sukunimi, setSukunimi] = useState("");
   const [zName, setZName] = useState<string | null>(null);
   const [counter, setCounter] = useState(420);
+  const [isLiking, setIsLiking] = useState(false);
+
+  useEffect(() => {
+    const fetchLikes = async () => {
+      try {
+        const res = await fetch("/api/lazzegenerator/likes", {
+          cache: "no-store",
+        });
+        if (res.ok) {
+          const data = await res.json();
+          if (typeof data.count === "number") {
+            setCounter(data.count);
+          }
+        }
+      } catch (e) {
+        // swallow
+      }
+    };
+    fetchLikes();
+  }, []);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -88,8 +108,26 @@ export default function LaZZeGeneratorPage() {
     }
   };
 
-  const handleThumb = () => {
+  const handleThumb = async () => {
+    if (isLiking) return;
+    setIsLiking(true);
+    // optimistic UI
     setCounter((c) => c + 1);
+    try {
+      const res = await fetch("/api/lazzegenerator/likes", {
+        method: "POST",
+      });
+      if (res.ok) {
+        const data = await res.json();
+        if (typeof data.count === "number") {
+          setCounter(data.count);
+        }
+      }
+    } catch (e) {
+      // ignore
+    } finally {
+      setIsLiking(false);
+    }
   };
 
   return (
@@ -204,6 +242,7 @@ export default function LaZZeGeneratorPage() {
             <button
               aria-label="Thumbs up"
               onClick={handleThumb}
+              disabled={isLiking}
               style={{
                 background: "#222",
                 border: "none",
@@ -237,6 +276,7 @@ export default function LaZZeGeneratorPage() {
             <button
               aria-label="Thumbs down"
               onClick={handleThumb}
+              disabled={isLiking}
               style={{
                 background: "#222",
                 border: "none",
