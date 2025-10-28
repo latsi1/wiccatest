@@ -22,6 +22,8 @@ export default function ChatWidget() {
   const [currentVideo, setCurrentVideo] = useState<string>("");
   const [isKaleResponsePlaying, setIsKaleResponsePlaying] = useState(false);
   const [currentKaleIndex, setCurrentKaleIndex] = useState(0);
+  const [isRecipeBot, setIsRecipeBot] = useState(false);
+  const [showBotSelection, setShowBotSelection] = useState(false);
   const callAudioRef = useRef<HTMLAudioElement | null>(null);
   const audioCtxRef = useRef<AudioContext | null>(null);
   const ringIntervalRef = useRef<number | null>(null);
@@ -108,38 +110,6 @@ export default function ChatWidget() {
       `Playing kale video ${currentKaleIndex + 6}: ${currentResponse}`
     );
     return currentResponse;
-  };
-
-  const isGreeting = (text: string) => {
-    const greetings = [
-      "hello",
-      "hey",
-      "hi",
-      "moro",
-      "terve",
-      "hei",
-      "wadaap",
-      "moi",
-      "greetings",
-      "good morning",
-      "good afternoon",
-      "good evening",
-      "morning",
-      "afternoon",
-      "evening",
-      "sup",
-      "yo",
-      "howdy",
-      "salut",
-      "bonjour",
-    ];
-    const lowerText = text.toLowerCase().trim();
-    console.log("Checking greeting for:", lowerText);
-    const isGreetingResult = greetings.some((greeting) =>
-      lowerText.includes(greeting)
-    );
-    console.log("Is greeting:", isGreetingResult);
-    return isGreetingResult;
   };
 
   const clearWaitingTimer = () => {
@@ -478,6 +448,208 @@ export default function ChatWidget() {
     }
   };
 
+  const selectBot = (botType: "kale" | "tarja2") => {
+    setIsRecipeBot(botType === "tarja2");
+    setShowBotSelection(false);
+    // Clear messages when switching bots
+    setMessages([]);
+  };
+
+  // Recipe bot functions
+  const isGreeting = (text: string): boolean => {
+    const lowerText = text.toLowerCase();
+    const greetings = [
+      "moi",
+      "hei",
+      "terve",
+      "moro",
+      "hey",
+      "hello",
+      "hi",
+      "wadaap",
+    ];
+    return greetings.some((greeting) => lowerText.includes(greeting));
+  };
+
+  const isRecipeSearch = (text: string): boolean => {
+    const lowerText = text.toLowerCase();
+    const recipeKeywords = [
+      "resepti",
+      "reseptit",
+      "kokata",
+      "ruoka",
+      "ruokalaji",
+      "ruokaa",
+      "keitto",
+      "kakku",
+      "piirakka",
+      "mureke",
+    ];
+    return recipeKeywords.some((keyword) => lowerText.includes(keyword));
+  };
+
+  const isIngredientSearch = (text: string): boolean => {
+    const lowerText = text.toLowerCase();
+    const ingredients = [
+      "jauheliha",
+      "kana",
+      "kala",
+      "lohi",
+      "mustikka",
+      "mansikka",
+      "omena",
+      "peruna",
+      "porkkana",
+      "sipuli",
+      "valkosipuli",
+      "kerma",
+      "maito",
+      "kananmuna",
+      "jauho",
+      "vehnäjauho",
+    ];
+    return ingredients.some((ingredient) => lowerText.includes(ingredient));
+  };
+
+  const getRecipeBotResponse = (text: string): string => {
+    const lowerText = text.toLowerCase();
+
+    // Greetings
+    if (isGreeting(text)) {
+      return "Moikka! 👋 Mitä tekisi mieli kokata tänään?";
+    }
+
+    // How are you
+    if (
+      lowerText.includes("mitä kuuluu") ||
+      lowerText.includes("miten menee")
+    ) {
+      return "Kivaa täällä, kiitos! Katsotaanko yhdessä resepti? Mainitse raaka-aine tai ruokalaji.";
+    }
+
+    // Thanks
+    if (
+      lowerText.includes("kiitos") ||
+      lowerText.includes("thx") ||
+      lowerText.includes("kiitti")
+    ) {
+      return "Ole hyvä! Jos haluat, voin suositella vastaavia reseptejä.";
+    }
+
+    // Don't know what to cook
+    if (lowerText.includes("en tiedä") || lowerText.includes("mitä tekisin")) {
+      return "Ei hätää! Haluatko suolaista (esim. keitto/mureke) vai makeaa (piirakka/kakku)?";
+    }
+
+    // Joke request
+    if (lowerText.includes("vitsi") || lowerText.includes("vitsiä")) {
+      return "Miksi kokki rakastaa reseptejä? Koska ne ovat mausteisia tarinoita. 😅";
+    }
+
+    // Who are you
+    if (lowerText.includes("kuka olet") || lowerText.includes("mikä olet")) {
+      return "Olen resepti-apuri. Osaan etsiä tarja2-käyttäjän reseptejä Kotikokista ja neuvoa korvaavia ainesosia.";
+    }
+
+    // Help
+    if (
+      lowerText.includes("apua") ||
+      lowerText.includes("ohje") ||
+      lowerText.includes("miten")
+    ) {
+      return "Kerro raaka-aine ('lohifilee', 'mustikka') tai ruoka ('mureke', 'piirakka'), niin linkitän ohjeen.";
+    }
+
+    // Recipe search
+    if (isRecipeSearch(text) || isIngredientSearch(text)) {
+      return getRecipeSearchResponse(text);
+    }
+
+    // Default response
+    return "Kerro raaka-aine tai ruokalaji, niin autan löytämään sopivan reseptin!";
+  };
+
+  const getRecipeSearchResponse = (text: string): string => {
+    const lowerText = text.toLowerCase();
+
+    // Check for specific ingredients
+    if (lowerText.includes("lohi") || lowerText.includes("lohifilee")) {
+      return `Tässä tarja2-reseptit, joissa mainitaan lohi:
+
+🐟 **Lohivoileipäkakku** - https://www.kotikokki.net/reseptit/nayta/205186/
+*Hieno leipä lohilla ja kasviksilla*
+
+Haluatko makeaa vai suolaista?`;
+    }
+
+    if (lowerText.includes("mustikka")) {
+      return `Tässä tarja2-reseptit, joissa mainitaan mustikka:
+
+🫐 **Mustikkapiirakka uunipellillinen** - https://www.kotikokki.net/reseptit/nayta/494002/
+*Klassinen mustikkapiirakka*
+
+Haluatko lisää makeita vai suolaisia reseptejä?`;
+    }
+
+    if (lowerText.includes("mansikka")) {
+      return `Tässä tarja2-reseptit, joissa mainitaan mansikka:
+
+🍓 **Tarjan mansikkapiirakka uunipellillinen** - https://www.kotikokki.net/reseptit/nayta/205709/
+*Herkullinen mansikkapiirakka*
+
+Haluatko lisää makeita reseptejä?`;
+    }
+
+    if (lowerText.includes("jauheliha")) {
+      return `Tässä tarja2-reseptit, joissa mainitaan jauheliha:
+
+🥩 **Jauhelihakiusaus** - https://www.kotikokki.net/reseptit/nayta/205709/
+*Perinteinen jauhelihakiusaus*
+
+Haluatko lisää suolaisia reseptejä?`;
+    }
+
+    // Check for dish types
+    if (lowerText.includes("keitto")) {
+      return `Tässä tarja2-keittoreseptit:
+
+🍲 **Kaalikeitto** - https://www.kotikokki.net/reseptit/nayta/205709/
+*Maukas kaalikeitto*
+
+Haluatko lisää keittoreseptejä?`;
+    }
+
+    if (lowerText.includes("kakku") || lowerText.includes("kakku")) {
+      return `Tässä tarja2-kakkureseptit:
+
+🎂 **Hyvä jouluinen luumukakku** - https://www.kotikokki.net/reseptit/nayta/205709/
+🎂 **Tiikerikakku** - https://www.kotikokki.net/reseptit/nayta/205709/
+🎂 **Kaunottarenkakku** - https://www.kotikokki.net/reseptit/nayta/205709/
+
+Haluatko lisää kakkureseptejä?`;
+    }
+
+    if (lowerText.includes("piirakka")) {
+      return `Tässä tarja2-piirakkareseptit:
+
+🥧 **Tarjan mansikkapiirakka uunipellillinen** - https://www.kotikokki.net/reseptit/nayta/205709/
+🥧 **Mustikkapiirakka uunipellillinen** - https://www.kotikokki.net/reseptit/nayta/494002/
+🥧 **Hyvä kinkkupiirakka uunipellillinen** - https://www.kotikokki.net/reseptit/nayta/205709/
+
+Haluatko lisää piirakkareseptejä?`;
+    }
+
+    // General recipe search
+    return `Etsitään tarja2-reseptejä hakusanalla: "${text}"
+
+Valitse linkki nähdäksesi tarkat ohjeet:
+• Vähän erilainen pizza - https://www.kotikokki.net/reseptit/nayta/205709/
+• Kaalikeitto - https://www.kotikokki.net/reseptit/nayta/205709/
+• Hyvä jouluinen luumukakku - https://www.kotikokki.net/reseptit/nayta/205709/
+
+*Huom: Näytän vain reseptin nimen ja linkin Kotikokki.netiin.*`;
+  };
+
   const sendMessage = async () => {
     const text = input.trim();
     if (!text || loading) return;
@@ -502,6 +674,21 @@ export default function ChatWidget() {
         startKaleResponse(); // Play random kale6-19 for other messages
       }
       return; // Don't send API request or show text responses
+    }
+
+    // Check if recipe bot should respond
+    if (isRecipeBot) {
+      setLoading(true);
+      const recipeResponse = getRecipeBotResponse(text);
+      const delay = 600 + Math.floor(Math.random() * 1200);
+      setTimeout(() => {
+        setMessages((prev) => [
+          ...prev,
+          { role: "assistant", content: recipeResponse },
+        ]);
+        setLoading(false);
+      }, delay);
+      return;
     }
 
     // Normal text chat mode
@@ -561,80 +748,161 @@ export default function ChatWidget() {
       {isOpen && (
         <div className={styles.popup}>
           <div className={styles.header}>
-            <div className={styles.headerLeft}>
-              <span className={styles.botName}>Kale</span>
-              <span className={styles.status}>
-                <span className={styles.dot} /> ONLINE
-              </span>
-              <button
-                className={styles.callMini}
-                onClick={isCalling ? endCall : startCall}
-                title={isCalling ? "Lopeta puhelu" : "Soita Kale"}
-              >
-                {isCalling ? "Lopeta" : "Soita"}
-              </button>
-            </div>
-            <button className={styles.close} onClick={() => setIsOpen(false)}>
-              ×
-            </button>
+            {showBotSelection ? (
+              // Simple header for bot selection
+              <>
+                <div className={styles.headerLeft}>
+                  <span className={styles.botName}>
+                    Valitse keskustelukumppani
+                  </span>
+                </div>
+                <button
+                  className={styles.close}
+                  onClick={() => setIsOpen(false)}
+                >
+                  ×
+                </button>
+              </>
+            ) : (
+              // Full header when bot is selected
+              <>
+                <div className={styles.headerLeft}>
+                  <span className={styles.botName}>
+                    {isRecipeBot ? "Tarja2" : "Kale"}
+                  </span>
+                  <span className={styles.status}>
+                    <span className={styles.dot} /> ONLINE
+                  </span>
+                  {!isRecipeBot && (
+                    <button
+                      className={styles.callMini}
+                      onClick={isCalling ? endCall : startCall}
+                      title={isCalling ? "Lopeta puhelu" : "Soita Kale"}
+                    >
+                      {isCalling ? "Lopeta" : "Soita"}
+                    </button>
+                  )}
+                </div>
+                <button
+                  className={styles.close}
+                  onClick={() => setIsOpen(false)}
+                >
+                  ×
+                </button>
+              </>
+            )}
           </div>
 
-          {/* Separate Video Window */}
-          {isCalling && hasAnswered && (
-            <div className={styles.videoWindow}>
-              <video
-                ref={videoRef}
-                className={styles.callVideo}
-                autoPlay
-                loop={currentVideo === "kaleafk.mp4"}
-                playsInline
-              >
-                <source src={`/${currentVideo}`} type="video/mp4" />
-                Your browser does not support the video tag.
-              </video>
+          {/* Bot Selection Screen */}
+          {showBotSelection && (
+            <div className={styles.botSelection}>
+              <div className={styles.botOptions}>
+                <button
+                  className={styles.botOption}
+                  onClick={() => selectBot("kale")}
+                >
+                  <div className={styles.botIcon}>
+                    <img
+                      src="/kheilprofile.png"
+                      alt="Kale"
+                      className={styles.botProfileImage}
+                    />
+                  </div>
+                  <div className={styles.botName}>Kale</div>
+                  <div className={styles.botDescription}>
+                    Wicca-tietäjä ja mystiikan asiantuntija
+                  </div>
+                </button>
+                <button
+                  className={styles.botOption}
+                  onClick={() => selectBot("tarja2")}
+                >
+                  <div className={styles.botIcon}>👩‍🍳</div>
+                  <div className={styles.botName}>Tarja2</div>
+                  <div className={styles.botDescription}>
+                    Resepti-apuri ja ruoanlaittotietäjä
+                  </div>
+                </button>
+              </div>
             </div>
           )}
-          <div className={styles.messages} ref={listRef}>
-            {messages.length === 0 && !isCalling && (
-              <div className={styles.hint}>
-                Kysy Wicca-aiheisia kysymyksiä. Esim: &quot;Mitä on esbat?&quot;
+
+          {/* Chat Content - only show when bot is selected */}
+          {!showBotSelection && (
+            <>
+              {/* Separate Video Window */}
+              {isCalling && hasAnswered && (
+                <div className={styles.videoWindow}>
+                  <video
+                    ref={videoRef}
+                    className={styles.callVideo}
+                    autoPlay
+                    loop={currentVideo === "kaleafk.mp4"}
+                    playsInline
+                  >
+                    <source src={`/${currentVideo}`} type="video/mp4" />
+                    Your browser does not support the video tag.
+                  </video>
+                </div>
+              )}
+              <div className={styles.messages} ref={listRef}>
+                {messages.length === 0 && !isCalling && (
+                  <div className={styles.hint}>
+                    {isRecipeBot
+                      ? "Kysy reseptejä! Esim: 'mustikkapiirakka' tai 'lohifilee'"
+                      : "Kysy Wicca-aiheisia kysymyksiä. Esim: 'Mitä on esbat?'"}
+                  </div>
+                )}
+                {messages.map((m, idx) => (
+                  <div
+                    key={idx}
+                    className={`${styles.message} ${
+                      m.role === "user" ? styles.user : styles.assistant
+                    }`}
+                  >
+                    {m.content}
+                  </div>
+                ))}
+                {loading && !isCalling && (
+                  <div className={styles.typing}>
+                    {isRecipeBot
+                      ? "Tarja2 kirjoittaa..."
+                      : "Kale kirjoittaa..."}
+                  </div>
+                )}
               </div>
-            )}
-            {messages.map((m, idx) => (
-              <div
-                key={idx}
-                className={`${styles.message} ${
-                  m.role === "user" ? styles.user : styles.assistant
-                }`}
-              >
-                {m.content}
+              <div className={styles.inputRow}>
+                <input
+                  className={styles.input}
+                  placeholder="Kirjoita viesti…"
+                  value={input}
+                  onChange={(e) => setInput(e.target.value)}
+                  onKeyDown={handleKeyDown}
+                />
+                <button
+                  className={styles.send}
+                  onClick={sendMessage}
+                  disabled={loading}
+                >
+                  Lähetä
+                </button>
               </div>
-            ))}
-            {loading && !isCalling && (
-              <div className={styles.typing}>Kale is writing...</div>
-            )}
-          </div>
-          <div className={styles.inputRow}>
-            <input
-              className={styles.input}
-              placeholder="Kirjoita viesti…"
-              value={input}
-              onChange={(e) => setInput(e.target.value)}
-              onKeyDown={handleKeyDown}
-            />
-            <button
-              className={styles.send}
-              onClick={sendMessage}
-              disabled={loading}
-            >
-              Lähetä
-            </button>
-          </div>
+            </>
+          )}
         </div>
       )}
       <button
         className={styles.fab}
-        onClick={() => setIsOpen((v) => !v)}
+        onClick={() => {
+          if (!isOpen) {
+            setShowBotSelection(true);
+            setIsOpen(true);
+          } else {
+            setIsOpen(false);
+            setShowBotSelection(false);
+            setIsRecipeBot(false);
+          }
+        }}
         aria-label="Open Wicca Chat"
       >
         <span className={styles.fabTop}>

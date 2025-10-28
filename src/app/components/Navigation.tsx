@@ -16,6 +16,7 @@ export default function Navigation() {
     community: language === "finnish" ? "Wiccers" : "Wiccers",
     soundboard: language === "finnish" ? "Soundboard" : "Soundboard",
     facts: language === "finnish" ? "Wicca Faktat" : "Wicca Facts",
+    wiccaboard: language === "finnish" ? "WiccaTube" : "WiccaTube",
   };
 
   return (
@@ -89,6 +90,14 @@ export default function Navigation() {
             className={pathname === "/lazzegenerator" ? styles.active : ""}
           >
             {language === "finnish" ? "LaZZeGeneraattori" : "LaZZeGenerator"}
+          </Link>
+        </li>
+        <li>
+          <Link
+            href="/wiccaboard"
+            className={pathname === "/wiccaboard" ? styles.active : ""}
+          >
+            {translations.wiccaboard}
           </Link>
         </li>
       </ul>

@@ -160,6 +160,23 @@
   font-style: italic;
 }
 
+/* Mobile responsiveness */
+@media (max-width: 768px) {
+  .botSelection {
+    padding: 1rem;
+  }
+
+  .botOptions {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .botOption {
+    min-width: 180px;
+    padding: 1rem;
+  }
+}
+
 .inputRow {
   display: flex;
   gap: 0.4rem;
@@ -193,6 +210,91 @@
   border-radius: 999px;
   cursor: pointer;
   font-size: 0.8rem;
+}
+
+.recipeBotToggle {
+  background: linear-gradient(135deg, #e67e22, #d35400);
+  border: none;
+  color: #fff;
+  padding: 0.2rem 0.5rem;
+  border-radius: 999px;
+  cursor: pointer;
+  font-size: 0.8rem;
+  margin-right: 0.5rem;
+}
+
+.recipeBotToggle:hover {
+  background: linear-gradient(135deg, #f39c12, #e67e22);
+}
+
+.botSelection {
+  padding: 2rem;
+  text-align: center;
+}
+
+.botSelectionTitle {
+  font-size: 1.2rem;
+  font-weight: 600;
+  margin-bottom: 1.5rem;
+  color: #333;
+}
+
+.botOptions {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.botOption {
+  background: #fff;
+  border: 2px solid #e0e0e0;
+  border-radius: 12px;
+  padding: 1.5rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  min-width: 200px;
+  text-align: center;
+}
+
+.botOption:hover {
+  border-color: #4a90e2;
+  box-shadow: 0 4px 12px rgba(74, 144, 226, 0.2);
+  transform: translateY(-2px);
+}
+
+.botOption:hover .botProfileImage {
+  border-color: #2ecc71;
+  box-shadow: 0 6px 16px rgba(46, 204, 113, 0.4);
+  transform: scale(1.05);
+}
+
+.botIcon {
+  font-size: 2.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.botProfileImage {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 3px solid #4a90e2;
+  box-shadow: 0 4px 12px rgba(74, 144, 226, 0.3);
+  transition: all 0.3s ease;
+}
+
+.botName {
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+  color: #333;
+}
+
+.botDescription {
+  font-size: 0.9rem;
+  color: #666;
+  line-height: 1.4;
 }
 
 .callOverlay {

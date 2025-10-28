@@ -1,0 +1,120 @@
+.previewCard {
+  position: relative;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  overflow: hidden;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  height: 200px;
+}
+
+.previewCard:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+  border-color: rgba(78, 205, 196, 0.5);
+}
+
+.previewCard.hovered {
+  transform: translateY(-5px) scale(1.02);
+}
+
+.videoContainer {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
+.previewVideo {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: opacity 0.3s ease;
+}
+
+.playOverlay {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: rgba(0, 0, 0, 0.7);
+  border-radius: 50%;
+  width: 60px;
+  height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+  pointer-events: none;
+}
+
+.playOverlay i {
+  font-size: 20px;
+  color: white;
+  margin-left: 3px; /* Offset for play icon centering */
+}
+
+.previewCard:hover .playOverlay {
+  background: rgba(78, 205, 196, 0.9);
+  transform: translate(-50%, -50%) scale(1.1);
+}
+
+.videoInfo {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: linear-gradient(transparent, rgba(0, 0, 0, 0.8));
+  padding: 1rem;
+  color: white;
+}
+
+.videoTitle {
+  font-size: 0.9rem;
+  font-weight: 600;
+  margin: 0 0 0.5rem 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.videoMeta {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.8rem;
+  opacity: 0.8;
+}
+
+.videoType {
+  background: rgba(78, 205, 196, 0.2);
+  padding: 0.2rem 0.5rem;
+  border-radius: 4px;
+  font-size: 0.7rem;
+}
+
+.videoDuration {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+}
+
+@media (max-width: 768px) {
+  .previewCard {
+    height: 180px;
+  }
+
+  .videoTitle {
+    font-size: 0.8rem;
+  }
+
+  .playOverlay {
+    width: 50px;
+    height: 50px;
+  }
+
+  .playOverlay i {
+    font-size: 16px;
+  }
+}
