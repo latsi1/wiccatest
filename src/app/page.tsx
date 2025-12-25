@@ -176,6 +176,50 @@ export default function Home() {
 
   return (
     <main className={styles.main}>
+      {/* Christmas Greeting Section */}
+      <div className={styles.christmasSection}>
+        <div className={styles.christmasLights}>
+          <span className={styles.light}></span>
+          <span className={styles.light}></span>
+          <span className={styles.light}></span>
+          <span className={styles.light}></span>
+          <span className={styles.light}></span>
+          <span className={styles.light}></span>
+          <span className={styles.light}></span>
+          <span className={styles.light}></span>
+          <span className={styles.light}></span>
+          <span className={styles.light}></span>
+        </div>
+        <h1 className={styles.christmasTitle}>
+          <span className={styles.star}>⭐</span>
+          HYVÄÄ JOULUA 2025!!! Toivottaa wicca oy:n wäki!!!
+          <span className={styles.star}>⭐</span>
+        </h1>
+        <div className={styles.christmasLights}>
+          <span className={styles.light}></span>
+          <span className={styles.light}></span>
+          <span className={styles.light}></span>
+          <span className={styles.light}></span>
+          <span className={styles.light}></span>
+          <span className={styles.light}></span>
+          <span className={styles.light}></span>
+          <span className={styles.light}></span>
+          <span className={styles.light}></span>
+          <span className={styles.light}></span>
+        </div>
+        <div className={styles.christmasVideoContainer}>
+          <video
+            className={styles.christmasVideo}
+            controls
+            preload="metadata"
+            playsInline
+          >
+            <source src="/wicca/haipit.mp4" type="video/mp4" />
+            Your browser does not support the video tag.
+          </video>
+        </div>
+      </div>
+
       {/* Game Release Announcement */}
       <div className={styles.gameAnnouncement}>
         <div className={styles.announcementContent}>
