@@ -52,6 +52,26 @@ A magical web application for generating Finnish Wiccan spells and connecting wi
 
 ## Setup
 
+### Vercel Blob storage
+
+The Blob SDK is installed for storing uploaded images. Locally, configure
+`BLOB_STORE_ID` and `BLOB_READ_WRITE_TOKEN` in `.env.local` and restart the
+development server after changing them. Keep the token server-side; never use
+a `NEXT_PUBLIC_` prefix or commit it to Git.
+
+In Vercel, connect the Blob store to this website's project and include the
+Development, Preview, and Production environments as needed. Local environment
+files are not deployed. With the Vercel CLI installed, `vercel link` followed by
+`vercel env pull .env.local` can synchronize the connected project's settings.
+
+Whispers and replies support one JPEG, PNG, or WebP image up to 4 MB. Use
+**Add image** to preview it and optionally add a screen-reader description.
+Image-only whispers are supported. The authenticated upload endpoint validates
+the image, removes metadata, and resizes it to a maximum of 1800 pixels before
+saving it as WebP in the public Blob store. Images are publicly accessible by
+URL. Image files currently remain in Blob when their whispers are deleted;
+unused uploads after a failed post also remain and can be removed in Vercel.
+
 ### Prerequisites
 
 - Node.js 18+ and npm

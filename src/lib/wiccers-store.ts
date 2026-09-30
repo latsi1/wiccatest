@@ -21,8 +21,18 @@ export interface Whisper {
     parentId: string | null;
     likes: string[];
     reposts: string[];
+    image?: WhisperImage;
+}
+export interface WhisperImage {
+    id: string;
+    url: string;
+    pathname: string;
+    width: number;
+    height: number;
+    alt: string;
 }
 export interface CommunityState {
+    uploads?: (WhisperImage & { memberId: string; createdAt: number; used: boolean })[];
     members: Member[];
     posts: Whisper[];
     sessions: {

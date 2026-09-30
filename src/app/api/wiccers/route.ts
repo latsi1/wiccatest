@@ -41,7 +41,7 @@ export async function GET(request: NextRequest) {
                     posts = [];
             }
             const page = posts.slice(0, 30);
-            const serialize = (p: typeof page[number]) => ({ id: p.id, content: p.content, createdAt: p.createdAt, parentId: p.parentId, author: publicMember(state, state.members.find(m => m.id === p.authorId)!, user?.id), likes: p.likes.length, liked: p.likes.includes(user?.id ?? ""), reposts: p.reposts.length, reposted: p.reposts.includes(user?.id ?? ""), replies: state.posts.filter(r => r.parentId === p.id).length, bookmarked: state.bookmarks.some(b => b.memberId === user?.id && b.postId === p.id) });
+            const serialize = (p: typeof page[number]) => ({ id: p.id, image: p.image ? { url: p.image.url, width: p.image.width, height: p.image.height, alt: p.image.alt } : undefined, content: p.content, createdAt: p.createdAt, parentId: p.parentId, author: publicMember(state, state.members.find(m => m.id === p.authorId)!, user?.id), likes: p.likes.length, liked: p.likes.includes(user?.id ?? ""), reposts: p.reposts.length, reposted: p.reposts.includes(user?.id ?? ""), replies: state.posts.filter(r => r.parentId === p.id).length, bookmarked: state.bookmarks.some(b => b.memberId === user?.id && b.postId === p.id) });
             const profile = state.members.find(m => m.id === profileId);
             const tags = new Map<string, number>();
             state.posts.filter(p => !p.parentId).forEach(p => { for (const tag of new Set(p.content.match(/#[\p{L}\p{N}_]+/gu) ?? []))
@@ -65,14 +65,19 @@ export async function POST(request: NextRequest) {
                 return NextResponse.json({ error: "Take a breath. Please wait a minute." }, { status: 429 });
             if (body.action === "post") {
                 const content = typeof body.content === "string" ? body.content.trim() : "";
-                if (!content || content.length > 500)
-                    throw new CommunityError("Write between 1 and 500 characters.");
+                const upload = typeof body.imageId === "string" ? state.uploads?.find(image => image.id === body.imageId && image.memberId === user.id && !image.used) : undefined;
+                if (body.imageId && !upload) throw new CommunityError("This attachment is unavailable. Choose the image again.");
+                const alt = typeof body.imageAlt === "string" ? body.imageAlt.trim() : "";
+                if ((!content && !upload) || content.length > 500 || alt.length > 250)
+                    throw new CommunityError("Add text or an image. Text allows 500 characters and image descriptions 250.");
                 const parentId = typeof body.parentId === "string" ? body.parentId : null;
                 if (parentId && !state.posts.some(p => p.id === parentId && !p.parentId))
                     throw new CommunityError("That conversation no longer exists.", 404);
                 if (!limit(state, `post:${user.id}`, 10, 60000))
                     return NextResponse.json({ error: "Please wait a minute before posting again." }, { status: 429 });
-                const post = { id: newId(), authorId: user.id, content, createdAt: new Date().toISOString(), parentId, likes: [], reposts: [] };
+                const image = upload ? { id: upload.id, url: upload.url, pathname: upload.pathname, width: upload.width, height: upload.height, alt } : undefined;
+                const post = { id: newId(), authorId: user.id, content, createdAt: new Date().toISOString(), parentId, likes: [], reposts: [], ...(image ? { image } : {}) };
+                if (upload) upload.used = true;
                 state.posts.push(post);
                 return NextResponse.json({ id: post.id }, { status: 201 });
             }
