@@ -100,7 +100,7 @@ export async function POST(request: Request) {
     const { nickname, content, parent_id } = await request.json();
 
     // Validate input
-    if (!nickname || !content) {
+    if (typeof nickname !== "string" || typeof content !== "string" || !nickname.trim() || !content.trim() || nickname.length > 50 || content.length > 5000 || (parent_id != null && (!Number.isSafeInteger(parent_id) || parent_id < 1))) {
       return NextResponse.json(
         { error: "Nickname and content are required" },
         { status: 400 }
@@ -145,29 +145,11 @@ export async function POST(request: Request) {
   }
 }
 
-export async function DELETE(request: Request) {
-  try {
-    const { searchParams } = new URL(request.url);
-    const id = searchParams.get("id");
-
-    if (!id) {
-      return NextResponse.json(
-        { error: "Post ID is required" },
-        { status: 400 }
-      );
-    }
-
-    // Delete the post and all its replies
-    await pool.query("DELETE FROM posts WHERE id = $1 OR parent_id = $1", [id]);
-
-    return NextResponse.json({ success: true });
-  } catch (error) {
-    console.error("Error deleting post:", error);
-    return NextResponse.json(
-      { error: "Failed to delete post" },
-      { status: 500 }
-    );
-  }
+export async function DELETE() {
+  return NextResponse.json(
+    { error: "Post deletion is disabled until server-side admin authentication is configured." },
+    { status: 403 }
+  );
 }
 
 // Add new PUT handler for voting
@@ -175,7 +157,7 @@ export async function PUT(request: Request) {
   try {
     const { id, vote, undo, change, voteValue } = await request.json();
 
-    if (!id || !vote) {
+    if (!Number.isSafeInteger(id) || id < 1 || !vote || (undo && voteValue !== 1 && voteValue !== -1)) {
       return NextResponse.json(
         { error: "Post ID and vote type are required" },
         { status: 400 }
@@ -219,3 +201,4 @@ export async function PUT(request: Request) {
     );
   }
 }
+

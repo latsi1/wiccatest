@@ -1,5 +1,26 @@
 # Wicca App
 
+## Wiccers community
+
+Open `/wiccer` for the redesigned mystical social feed. Create a profile using
+only a name and password, then post whispers, reply, like, repost, bookmark,
+follow other members, and edit your bio and avatar color. No email is collected.
+Keep your password safe: email password recovery is unavailable.
+
+Run `npm install` and `npm run dev` to start locally. Without `DATABASE_URL`,
+development accounts and posts persist in the Git-ignored `.local/wiccers.json`.
+Use one development server for this local data. Production requires a PostgreSQL
+`DATABASE_URL`; local file storage is disabled in production. The new community
+creates its own table and imports old posts as archived identities without
+changing the original posts table. Deployment and archive import still need
+verification against your configured database.
+
+With the development server running on port 3000, run `npm run test:wiccers` for
+the API integration tests. Set `WICCERS_TEST_ORIGIN` if you use another port.
+Tests only run against local storage and remove their disposable test accounts.
+
+See [PROJECT_REVIEW.md](PROJECT_REVIEW.md) for the project audit and implementation notes.
+
 A magical web application for generating Finnish Wiccan spells and connecting with the community.
 
 ## Features

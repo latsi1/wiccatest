@@ -13,8 +13,8 @@ const cinzel = Cinzel({
 });
 
 export const metadata: Metadata = {
-  title: "Wicca App",
-  description: "A magical app for all your needs",
+  title: { default: "Wiccoset — oma pieni maailma", template: "%s | Wiccoset" },
+  description: "Wiccoset: loitsuja, tarinoita, ääniä ja yhteisön unohtumattomia hetkiä.",
 };
 
 export default function RootLayout({
@@ -23,17 +23,18 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" className={`${inter.className} ${cinzel.variable}`}>
+    <html lang="fi" className={`${inter.className} ${cinzel.variable}`}>
       <head>
         <link
           rel="stylesheet"
           href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
         />
       </head>
-      <body style={{ background: "black", minHeight: "100vh" }}>
+      <body>
+        <a className="skipLink" href="#page-content">Siirry sisältöön / Skip to content</a>
         <LanguageProvider>
           <Navigation />
-          {children}
+          <div id="page-content" tabIndex={-1}>{children}</div>
           <ChatWidget />
         </LanguageProvider>
       </body>

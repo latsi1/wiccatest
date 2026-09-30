@@ -6,7 +6,8 @@
     "dev": "next dev --turbopack",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint",
+    "lint": "eslint src",
+    "test:wiccers": "node tests/wiccers.test.mjs",
     "seed": "ts-node --project tsconfig.json src/app/api/posts/seed.ts"
   },
   "dependencies": {

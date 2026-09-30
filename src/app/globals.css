@@ -95,3 +95,6 @@ a {
   background-color: var(--text-muted);
   cursor: not-allowed;
 }
+/* Shared calm palette; existing page modules can retain their own character. */
+:root{--primary-color:#aebf9d;--primary-light:#cad8be;--primary-dark:#6c825c;--secondary-color:#9bae87;--accent-color:#c3d2ad;--background-dark:#101c17;--background-card:#15221b;--background-input:#1c2a21;--background-hover:#243329;--border-color:#344036;--text-primary:#e7e8df;--text-secondary:#bdc5b5;--text-muted:#99a590;--background-rgb:16,28,23;--foreground-rgb:231,232,223}
+html{scroll-behavior:smooth;scroll-padding-top:100px}body{font-family:Arial,Helvetica,sans-serif}button,input,textarea,select{font:inherit}a,button,input,textarea,summary,select{outline-offset:5px}:focus-visible{outline:2px solid #c3d2ad}.skipLink{position:fixed;left:20px;top:-80px;z-index:2000;padding:12px 20px;background:#cad8be;color:#15221b;border-radius:4px}.skipLink:focus{top:15px}@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}*,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}}

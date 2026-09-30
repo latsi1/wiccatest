@@ -416,3 +416,5 @@
   border-radius: 999px;
   cursor: pointer;
 }
+/* Keep the shared chat control in the same visual family. */
+.fab{background:#19271f;border-color:#506146;border-radius:24px;padding:12px 18px}.fabTop{gap:8px}.fabLabel{font-size:10px;letter-spacing:1px}.fabStatus{display:none}.fabIcon{font-size:17px}.popup{bottom:60px;width:min(360px,calc(100vw - 40px));background:#15221b;border-color:#40503b}.header{color:#c3d2ad;background:#101c17}.container{z-index:150}

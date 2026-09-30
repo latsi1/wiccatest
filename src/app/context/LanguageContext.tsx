@@ -1,54 +1,26 @@
 "use client";
-
-import React, {
-  createContext,
-  useState,
-  useContext,
-  useEffect,
-  ReactNode,
-} from "react";
-
+import { createContext, useState, useContext, useEffect, ReactNode } from "react";
 type Language = "finnish" | "english";
-
-interface LanguageContextType {
-  language: Language;
-  setLanguage: (language: Language) => void;
-}
-
-const LanguageContext = createContext<LanguageContextType | undefined>(
-  undefined
-);
-
-export function LanguageProvider({ children }: { children: ReactNode }) {
-  const [language, setLanguage] = useState<Language>("finnish");
-
-  // Load language preference from localStorage on client sides
-  useEffect(() => {
-    const savedLanguage = localStorage.getItem("language") as Language;
-    if (savedLanguage) {
-      setLanguage(savedLanguage);
+const LanguageContext = createContext<{
+    language: Language;
+    setLanguage: (language: Language) => void;
+} | undefined>(undefined);
+export function LanguageProvider({ children }: {
+    children: ReactNode;
+}) {
+    const [language, setLanguage] = useState<Language>("finnish");
+    useEffect(() => { try {
+        const saved = localStorage.getItem("language");
+        if (saved === "finnish" || saved === "english")
+            setLanguage(saved);
     }
-  }, []);
-
-  // Save language preference to localStorage when it changes
-  const handleLanguageChange = (newLanguage: Language) => {
-    setLanguage(newLanguage);
-    localStorage.setItem("language", newLanguage);
-  };
-
-  return (
-    <LanguageContext.Provider
-      value={{ language, setLanguage: handleLanguageChange }}
-    >
-      {children}
-    </LanguageContext.Provider>
-  );
+    catch { /* Preferences are optional when storage is unavailable. */ } }, []);
+    useEffect(() => { document.documentElement.lang = language === "finnish" ? "fi" : "en"; }, [language]);
+    const changeLanguage = (value: Language) => { setLanguage(value); try {
+        localStorage.setItem("language", value);
+    }
+    catch { /* The current session still supports switching. */ } };
+    return <LanguageContext.Provider value={{ language, setLanguage: changeLanguage }}>{children}</LanguageContext.Provider>;
 }
-
-export function useLanguage() {
-  const context = useContext(LanguageContext);
-  if (context === undefined) {
-    throw new Error("useLanguage must be used within a LanguageProvider");
-  }
-  return context;
-}
+export function useLanguage() { const context = useContext(LanguageContext); if (!context)
+    throw new Error("useLanguage must be used within a LanguageProvider"); return context; }
