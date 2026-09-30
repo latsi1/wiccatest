@@ -14,6 +14,93 @@
   padding:65px 0
 }
 
+.launch {
+  position:relative;
+  isolation:isolate;
+  overflow:hidden;
+  display:grid;
+  grid-template-columns:1.35fr 1fr;
+  align-items:center;
+  gap:25px;
+  margin-top:35px;
+  padding:48px 52px;
+  border:1px solid #bc91ec55;
+  border-radius:24px;
+  background:linear-gradient(120deg,#22192e,#151c24 75%);
+  box-shadow:0 20px 80px #00000025,inset 0 1px 0 #ffffff09;
+}
+.launchGlow {
+  position:absolute;
+  z-index:-1;
+  inset:-40%;
+  background:radial-gradient(ellipse at 75% 50%,#9362d52b,transparent 45%);
+  animation:launchBreathe 8s ease-in-out infinite alternate;
+}
+.launchBadge {
+  display:inline-flex;
+  align-items:center;
+  gap:9px;
+  color:#dbc3f6;
+  font-size:10px;
+  font-weight:600;
+  letter-spacing:2px;
+}
+.launchBadge>span { width:7px; height:7px; border-radius:50%; background:#c4e5ad; box-shadow:0 0 12px #c4e5ad70; }
+.main .launch h2 { margin:20px 0 10px; font-size:clamp(48px,6.4vw,84px); letter-spacing:-3px; line-height:1.05; color:#f3eafa; }
+.launch h2>span { color:#c6a0ed; }
+.launchHeadline { font-family:Georgia,serif; font-size:25px; color:#ddcaeb; line-height:1.4; }
+.launchDescription { max-width:510px; margin-top:16px; font-size:14px; line-height:1.9; color:#bcb1c8; }
+.launchLink {
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:35px;
+  width:fit-content;
+  min-width:300px;
+  margin-top:26px;
+  padding:20px 27px;
+  border:1px solid #dfc7f8;
+  border-radius:14px;
+  color:#21152f;
+  background:linear-gradient(110deg,#ead9fb,#bfa0e5);
+  font-size:22px;
+  font-weight:650;
+  box-shadow:0 6px 30px #ac78db25;
+  transition:transform .25s,box-shadow .25s;
+}
+.launchLink:hover { transform:translateY(-4px); box-shadow:0 12px 40px #ac78db45; }
+.launchLink:focus-visible { outline:3px solid #eff3ce; outline-offset:5px; }
+.launchLink>span { font-size:30px; font-weight:400; }
+.launchNote { margin-top:13px; font-size:11px; color:#b9a6ca; }
+.chatLaunchNews { margin-top:26px; padding-top:22px; border-top:1px solid #c6a0ed25; }
+.chatLaunchLabel { font-size:8px; letter-spacing:1.6px; color:#c6a0ed; }
+.chatLaunchItems { display:grid; gap:14px; margin:16px 0; }
+.chatLaunchItems>p { display:flex; gap:12px; align-items:center; }
+.chatLaunchItems>p>span:first-child { display:grid; place-items:center; width:33px; height:33px; border-radius:10px; background:#c6a0ed0c; border:1px solid #c6a0ed25; color:#cfb3e9; font-size:21px; flex-shrink:0; }
+.chatLaunchItems strong { display:block; font-size:13px; font-weight:500; color:#eadcf6; }
+.chatLaunchItems small { display:block; font-size:11px; line-height:1.7; margin-top:3px; color:#b5a7c0; }
+.chatLaunchButton { display:inline-flex; align-items:center; gap:24px; background:transparent; padding:8px 0; border:0; color:#d9b9f5; font-size:12px; cursor:pointer; transition:color .2s; }
+.chatLaunchButton:hover { color:#fff; }
+.chatLaunchButton:focus-visible { outline:2px solid #e6d5fa; outline-offset:4px; border-radius:4px; }
+.launchArt { position:relative; height:300px; display:grid; place-items:center; }
+.launchRing { position:absolute; width:260px; height:260px; border:1px solid #d5b7f130; border-radius:50%; box-shadow:0 0 60px #ac78db12; }
+.launchRing:after { content:""; position:absolute; inset:22px; border:1px dashed #d5b7f120; border-radius:50%; }
+.launchMoon { color:#e2cdf4; font-size:200px; line-height:1; transform:rotate(-15deg); text-shadow:0 0 65px #bca0e560; }
+.launchStar { position:absolute; top:25px; right:25px; font-size:35px; color:#d9c394; }
+.launchStarSmall { position:absolute; left:25px; bottom:65px; font-size:25px; color:#c8b0e6; }
+.launchArtCaption { position:absolute; bottom:0; font-size:9px; letter-spacing:3px; color:#b9a6ca; }
+@keyframes launchBreathe { from { opacity:.65; transform:scale(.95); } to { opacity:1; transform:scale(1.05); } }
+@media(max-width:700px) {
+  .launch { padding:30px 24px; grid-template-columns:1fr; margin-top:25px; }
+  .launchArt { display:none; }
+  .launchLink { min-width:0; width:100%; font-size:20px; padding:17px 20px; }
+  .launchHeadline { font-size:22px; }
+}
+@media(prefers-reduced-motion:reduce) {
+  .launchGlow { animation:none; }
+  .launchLink { transition:none; }
+}
+
 .eyebrow {
   font-size:10px!important;
   font-weight:600;
@@ -508,4 +595,3 @@
     transition:none
   }
 }
-

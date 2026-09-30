@@ -14,6 +14,23 @@ export default function Home() {
     const fi = language === "finnish";
     const articles = journal[language].join("\n").split(/\n-{10,}[^\n]*\n/).map(s => s.split("\n").filter(Boolean));
     return <main id="main-content" className={styles.main}>
+    <section className={styles.launch} aria-labelledby="wiccers-launch-title">
+      <div className={styles.launchGlow} aria-hidden="true"/>
+      <div className={styles.launchCopy}>
+        <p className={styles.launchBadge}><span aria-hidden="true"/> {fi ? "UUSI AIKAKAUSI ON TÄÄLLÄ" : "A NEW ERA IS HERE"}</p>
+        <h2 id="wiccers-launch-title">Wiccers <span>2.0</span></h2>
+        <p className={styles.launchHeadline}>{fi ? "Uudistunut piiri. Enemmän magiaa." : "A new circle. More magic."}</p>
+        <p className={styles.launchDescription}>{fi ? "Wiccers 2.0 on julkaistu! Luo oma profiilisi, jaa kuiskauksia ja kuvia sekä löydä oma yhteisösi tähtien alta." : "Wiccers 2.0 is live! Create your profile, share whispers and images, and find your people under the stars."}</p>
+        <Link className={styles.launchLink} href="/wiccer">{fi ? "Astu Wiccersiin" : "Enter Wiccers"}<span aria-hidden="true">↗</span></Link>
+        <p className={styles.launchNote}>{fi ? "Vain nimi ja salasana. Ei sähköpostia." : "Just a name and password. No email."}</p>
+        <div className={styles.chatLaunchNews}>
+          <p className={styles.chatLaunchLabel}>{fi ? "MYÖS CHAT SAI UUTTA MAGIAA" : "THE CHAT GOT NEW MAGIC, TOO"}</p>
+          <div className={styles.chatLaunchItems}><p><span aria-hidden="true">☾</span><span><strong>{fi ? "Kale on nyt uusilla leveleillä" : "Kale has reached new levels"}</strong><small>{fi ? "Nasevaa naljailua ja kosmisia vastauksia." : "Sharp banter and cosmic answers."}</small></span></p><p><span aria-hidden="true">♨</span><span><strong>{fi ? "Tarja2 onkin nyt Tarja3" : "Tarja2 is now Tarja3"}</strong><small>{fi ? "Reseptit, ainesosat ja ruokakuvat samassa chatissa." : "Recipes, ingredients, and food photos in one chat."}</small></span></p></div>
+          <button type="button" className={styles.chatLaunchButton} onClick={() => window.dispatchEvent(new Event("wiccoset:open-chat"))}>{fi ? "Kokeile uudistunutta chattia" : "Try the new chat"} <span aria-hidden="true">↗</span></button>
+        </div>
+      </div>
+      <div className={styles.launchArt} aria-hidden="true"><span className={styles.launchRing}/><span className={styles.launchMoon}>☾</span><span className={styles.launchStar}>✦</span><span className={styles.launchStarSmall}>✧</span><span className={styles.launchArtCaption}>A LITTLE SOCIAL MAGIC</span></div>
+    </section>
     <section className={styles.hero} aria-labelledby="welcome-title">
       <div><p className={styles.eyebrow}>{fi ? "LUONTO · MIELIKUVITUS · YHTEISÖ" : "NATURE · IMAGINATION · COMMUNITY"}</p>
       <h1 id="welcome-title">{fi ? <>Pieni hetki.<br />Hieman <em>magiaa.</em></> : <>A quiet moment.<br />A little <em>magic.</em></>}</h1>

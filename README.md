@@ -117,26 +117,52 @@ This application is designed to be deployed on Vercel. Make sure to add the foll
 
 - `DATABASE_URL`: Your Neon PostgreSQL connection string
 
-### Wicca Chat (Hugging Face Inference)
+### Kale and Tarja2 chat (Groq)
 
 To enable the site-wide Wicca Chat bot:
 
-1. Create a free token at https://huggingface.co/settings/tokens
-2. Add the token locally or in Vercel env vars:
+The chat now uses Groq instead of the old Hugging Face inference endpoint.
+Kale answers in Finnish with a playful mystical personality; Tarja2 is a
+fictional chef assistant recommending verified tarja2 recipes from Kotikokki.
+Recipe cards link to the original instructions and show source photographs.
+The owner confirmed permission to display these photographs. Recipe metadata
+is fetched from public pages and cached for six hours. The catalog includes
+the profile's latest recipes and selected verified classics, not every recipe.
+Source failures never generate invented links or images.
 
-Local (PowerShell):
+Recipe searches use the newest message and verified titles/ingredients, rather
+than accumulating every old search term. Requests for a random or another
+recipe choose an unseen recipe from the current catalog; once all have been
+shown, the immediately preceding recipe is excluded. The browser carries only
+recipe IDs between turns. Recipe result introductions and no-match replies are
+source-based and work without an AI call; general chef conversation still uses
+Groq. These source-based replies use `mode: recipe`, so they do not claim that AI
+is unavailable. Run `node tests/recipe-search.test.mjs` for search regressions.
+
+1. Create a free Groq account and API key at https://console.groq.com/keys.
+2. Add the server-side key to `.env.local` and Vercel Project Settings →
+   Environment Variables (Production/Preview as needed):
+
+Local (`.env.local`):
 
 ```
-$env:HF_API_TOKEN="hf_...your_token_here"
+GROQ_API_KEY=your_key_here
+GROQ_MODEL=openai/gpt-oss-20b
 ```
 
 Vercel → Project Settings → Environment Variables:
 
-- Key: `HF_API_TOKEN`
+- Key: `GROQ_API_KEY`
 - Value: your token value
 - Environments: Development/Preview/Production
 
-Optional: choose a different model by setting `HF_MODEL` (default: `mistralai/Mistral-7B-Instruct-v0.2`).
+Restart the development server or redeploy after adding the key. Stay on the
+Free plan for no-cost usage; provider quotas can change and are shared across
+visitors. The app limits requests per IP and adds global minute/day limits;
+the provider's token limits may be reached earlier. Without a key, or when AI
+is unavailable, explicitly labelled local replies and recipe cards still work.
+Local replies are scripted, not generative AI. Conversation history is sent
+to Groq only when configured, and is not saved by this chat endpoint.
 
 ## Database Setup
 
