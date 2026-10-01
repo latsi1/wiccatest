@@ -85,6 +85,14 @@ export async function POST(request: NextRequest) {
                 const bio = typeof body.bio === "string" ? body.bio.trim() : "";
                 if (bio.length > 160 || !["sage", "violet", "amber", "rose"].includes(String(body.color)))
                     throw new CommunityError("Choose an avatar color and a bio up to 160 characters.");
+                const name = body.name === undefined ? user.name : typeof body.name === "string" ? body.name.trim().normalize("NFKC") : "";
+                if (!/^[\p{L}\p{N}_-]{3,24}$/u.test(name))
+                    throw new CommunityError("Use a name of 3–24 letters, numbers, _ or -.");
+                const key = name.toLowerCase();
+                if (state.members.some(member => member.id !== user.id && member.key === key))
+                    throw new CommunityError("That name already belongs to someone in the circle.", 409);
+                user.name = name;
+                user.key = key;
                 user.bio = bio;
                 user.color = String(body.color);
                 return NextResponse.json({ user: publicMember(state, user, user.id) });

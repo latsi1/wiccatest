@@ -698,6 +698,56 @@
   color:#b9d3b0
 }
 
+.postActions button.deletePostButton {
+  color:#eeb5bc;
+  font-size:11px
+}
+
+.dangerButton {
+  border:1px solid #eeb5bc66;
+  border-radius:9px;
+  padding:12px 16px;
+  color:#ffd2d8;
+  background:#eeb5bc12;
+  font-size:12px;
+  min-height:44px
+}
+
+.dangerButton:hover {
+  background:#eeb5bc25
+}
+
+.dangerButton:disabled {
+  opacity:.5;
+  cursor:wait
+}
+
+.confirmActions {
+  display:flex;
+  flex-wrap:wrap;
+  justify-content:flex-end;
+  gap:12px;
+  margin-top:24px
+}
+
+.accountDanger {
+  border-top:1px solid #eeb5bc30;
+  margin-top:32px;
+  padding-top:22px
+}
+
+.accountDanger h3 {
+  color:#eeb5bc;
+  font-size:14px
+}
+
+.accountDanger p {
+  color:#b29ac5;
+  font-size:12px;
+  line-height:1.7;
+  margin:12px 0 18px
+}
+
 .repostNote {
   display:flex;
   align-items:center;

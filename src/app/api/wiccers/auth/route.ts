@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { randomBytes } from "node:crypto";
+import { del } from "@vercel/blob";
 import { withCommunity, currentMember, publicMember, limit, tokenHash, newId, CommunityError, storageMode } from "@/lib/wiccers-store";
 import { COOKIE, SESSION_AGE, assertOrigin, readBody, failure, hashPassword, verifyPassword, sessionCookie } from "@/lib/wiccers-auth";
 export const runtime = "nodejs";
@@ -15,6 +16,45 @@ export async function POST(request: NextRequest) {
     try {
         assertOrigin(request);
         const body = await readBody(request);
+        if (body.action === "delete-account") {
+            const token = request.cookies.get(COOKIE)?.value;
+            const member = await withCommunity(state => {
+                const user = currentMember(state, token);
+                if (!user) throw new CommunityError("Sign in to manage your account.", 401);
+                if (!limit(state, `delete-account:${user.id}`, 5, 15 * 60 * 1000))
+                    throw new CommunityError("Too many attempts. Please wait 15 minutes.", 429);
+                return { id: user.id, passwordHash: user.passwordHash };
+            });
+            if (typeof body.password !== "string" || body.password.length > 128 || !(await verifyPassword(body.password, member.passwordHash)))
+                throw new CommunityError("Password is incorrect.", 401);
+            const imageUrls = await withCommunity(state => {
+                const user = currentMember(state, token);
+                if (!user || user.id !== member.id || user.passwordHash !== member.passwordHash)
+                    throw new CommunityError("Sign in again before deleting your account.", 401);
+                const ownPosts = state.posts.filter(post => post.authorId === user.id);
+                const roots = new Set(ownPosts.filter(post => !post.parentId).map(post => post.id));
+                const removed = new Set([...ownPosts.map(post => post.id), ...state.posts.filter(post => post.parentId && roots.has(post.parentId)).map(post => post.id)]);
+                const urls = new Set([...ownPosts.flatMap(post => post.image ? [post.image.url] : []), ...(state.uploads ?? []).filter(image => image.memberId === user.id).map(image => image.url)]);
+                state.posts = state.posts.filter(post => !removed.has(post.id));
+                for (const post of state.posts) {
+                    post.likes = post.likes.filter(id => id !== user.id);
+                    post.reposts = post.reposts.filter(id => id !== user.id);
+                }
+                state.members = state.members.filter(m => m.id !== user.id);
+                state.sessions = state.sessions.filter(session => session.memberId !== user.id);
+                state.follows = state.follows.filter(follow => follow.from !== user.id && follow.to !== user.id);
+                state.bookmarks = state.bookmarks.filter(bookmark => bookmark.memberId !== user.id && !removed.has(bookmark.postId));
+                state.uploads = (state.uploads ?? []).filter(image => image.memberId !== user.id);
+                state.limits = state.limits.filter(entry => !entry.key.endsWith(`:${user.id}`));
+                return [...urls];
+            });
+            let imagesRemoved = true;
+            if (imageUrls.length) {
+                try { await del(imageUrls); }
+                catch { imagesRemoved = false; console.error("Account deleted, but Blob image cleanup failed."); }
+            }
+            return sessionCookie(NextResponse.json({ user: null, deleted: true, imagesRemoved }), "", 0);
+        }
         if (body.action === "logout") {
             await withCommunity(state => { const hash = tokenHash(request.cookies.get(COOKIE)?.value ?? ""); state.sessions = state.sessions.filter(s => s.hash !== hash); });
             return sessionCookie(NextResponse.json({ user: null }), "", 0);
@@ -44,6 +84,8 @@ export async function POST(request: NextRequest) {
                 state.members.push(member);
             }
             if (!member || member.archived)
+                throw new CommunityError("Name or password is incorrect.", 401);
+            if (body.action === "login" && (member.id !== stored?.id || member.passwordHash !== stored.passwordHash))
                 throw new CommunityError("Name or password is incorrect.", 401);
             const previous = request.cookies.get(COOKIE)?.value;
             state.sessions = state.sessions.filter(s => s.expires > Date.now() && (!previous || s.hash !== tokenHash(previous)));

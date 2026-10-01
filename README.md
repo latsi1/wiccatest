@@ -7,6 +7,19 @@ only a name and password, then post whispers, reply, like, repost, bookmark,
 follow other members, and edit your bio and avatar color. No email is collected.
 Keep your password safe: email password recovery is unavailable.
 
+In **Profile → Edit profile**, members can change their username without losing
+posts, follows, or their active session. The new name must be unique (ignoring
+case), and future sign-ins use the new name with the existing password. Each
+member sees **Delete** on their own posts and comments, with a confirmation before
+removal. Deleting a top-level post also deletes its conversation.
+
+**Delete my account** is available at the bottom of the profile editor. It requires
+the current password, deletes the member's posts and comments plus conversations
+under their posts, removes follows, bookmarks, likes and reposts, and invalidates
+all their sessions. The server attempts to delete their uploaded Blob images as
+well; if image cleanup fails, the response reports this and the interface asks
+the user to contact the site owner. Account and post deletion cannot be undone.
+
 Run `npm install` and `npm run dev` to start locally. Without `DATABASE_URL`,
 development accounts and posts persist in the Git-ignored `.local/wiccers.json`.
 Use one development server for this local data. Production requires a PostgreSQL
